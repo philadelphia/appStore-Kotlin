@@ -7,7 +7,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import androidx.core.content.FileProvider
-import com.example.installer.service.DownloadService
+import com.example.installer.service.KtDownloadService
 import java.io.File
 
 /**
@@ -17,7 +17,7 @@ import java.io.File
  **/
 class MyReceiver() : BroadcastReceiver() {
     override fun onReceive(context: Context?, intent: Intent?) {
-        val fileName = intent!!.getStringExtra(DownloadService.FILE_NAME)
+        val fileName = intent!!.getStringExtra(KtDownloadService.FILE_NAME)
         installAPK(context, fileName)
     }
 

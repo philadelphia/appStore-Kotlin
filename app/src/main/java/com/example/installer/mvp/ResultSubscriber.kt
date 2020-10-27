@@ -24,12 +24,13 @@ abstract class ResultSubscriber<T>() : Subscriber<Result<T>>() {
 
     override fun onNext(result: Result<T>?) {
         if (result?.code == 0) {
-//            onSuccess(result?.data?.data)
+            onSuccess(result?.data?.data as T)
         } else {
             onError(result?.message)
         }
     }
 
+    override fun onCompleted() {}
 
     abstract fun onSuccess(t: T)
     abstract fun onError(message: String?)

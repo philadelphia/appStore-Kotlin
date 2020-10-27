@@ -26,8 +26,8 @@ data class APKEntity(val s: String) : ISelectable {
      */
     var id: String? = null
     var version_name: String? = null
-    val application_id: String? = null
-    val application_name: String? = null
+    var application_id: String? = null
+    var application_name: String? = null
     val system_name: String? = null
     val version_describe: Any? = null
     val download_url: String? = null
@@ -45,6 +45,6 @@ data class APKEntity(val s: String) : ISelectable {
     }
 
     override fun getName(): String? {
-        return name
+        return application_name
     }
 }

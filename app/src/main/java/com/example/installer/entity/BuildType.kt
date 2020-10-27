@@ -6,10 +6,12 @@ package com.example.installer.entity
 
  **/
 data class BuildType(val buildTypes: String?) : ISelectable {
-    private var buildType: String? = null
+    var buildType: String? = null
+
     init {
         this.buildType = buildTypes
     }
+
     override fun getID(): String {
         return "0"
     }

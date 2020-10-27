@@ -28,7 +28,7 @@ import com.example.installer.entity.ISelectable
 import com.example.installer.entity.PackageEntity
 import com.example.installer.mvp.MvpContract.IView
 import com.example.installer.mvp.MyPresenter
-import com.example.installer.service.DownloadService
+import com.example.installer.service.KtDownloadService
 import com.example.installer.utils.EndlessRecyclerOnScrollListener
 import com.example.installer.utils.NetWorkUtil
 import com.example.installer.view.CustomBottomSheetDialog
@@ -74,7 +74,6 @@ class MainActivity : AppCompatActivity(), IView, SwipeRefreshLayout.OnRefreshLis
         binding.swipeRefreshLayout.setOnRefreshListener(this)
         initData()
         requestPermissions()
-        registerReceiver()
         initAdapter()
 
         binding.filterBuildType.setOnClickListener { showBuildTypeDialog(mBuildTypeList) }
@@ -107,7 +106,6 @@ class MainActivity : AppCompatActivity(), IView, SwipeRefreshLayout.OnRefreshLis
         buildTypeBottomSheetDialog.show()
         buildTypeBottomSheetDialog.setOnItemClickListener(this)
     }
-
 
     private fun showApkNameDialog(dataSource: MutableList<PackageEntity>) {
         packageBottomSheetDialog.setDataList(dataSource)
@@ -157,9 +155,15 @@ class MainActivity : AppCompatActivity(), IView, SwipeRefreshLayout.OnRefreshLis
             }
     }
 
-    private fun registerReceiver() {
+    override fun onPause() {
+        super.onPause()
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver)
+    }
+
+    override fun onResume() {
+        super.onResume()
         receiver = MyReceiver();
-        val intentFilter = IntentFilter(DownloadService.BROADCAST_ACTION)
+        val intentFilter = IntentFilter(KtDownloadService.BROADCAST_ACTION)
         intentFilter.addCategory(Intent.CATEGORY_DEFAULT)
         LocalBroadcastManager.getInstance(this).registerReceiver(receiver, intentFilter)
     }
@@ -240,11 +244,11 @@ class MainActivity : AppCompatActivity(), IView, SwipeRefreshLayout.OnRefreshLis
     }
 
     private fun downLoadAPK(url: String?, fileName: String?) {
-        val serviceIntent = Intent(this, DownloadService::class.java)
+        val serviceIntent = Intent(this, KtDownloadService::class.java)
         serviceIntent.data = Uri.parse(url)
-        serviceIntent.putExtra(DownloadService.FILE_NAME, fileName)
-        serviceIntent.putExtra(DownloadService.DOWNLOAD_PATH, DOWNLOAD_PATH)
-        DownloadService.enqueueWork(this, serviceIntent)
+        serviceIntent.putExtra(KtDownloadService.FILE_NAME, fileName)
+        serviceIntent.putExtra(KtDownloadService.DOWNLOAD_PATH, DOWNLOAD_PATH)
+        KtDownloadService.enqueueWork(this, serviceIntent)
     }
 
     override fun onLoadApplicationListSuccess(dataSource: Iterable<PackageEntity>) {
@@ -361,10 +365,10 @@ class MainActivity : AppCompatActivity(), IView, SwipeRefreshLayout.OnRefreshLis
         if (entity is PackageEntity) {
             if (position == 0) {
                 mApplicationID = null
-                binding.filterPackageName.isHighlight = false
+                binding.filterPackageName.setHighLight(false)
             } else {
                 mApplicationID = entity.getID()
-                binding.filterPackageName.isHighlight = true
+                binding.filterPackageName.setHighLight(true)
             }
             binding.filterPackageName.setTitle(entity.getName())
             doFilter(mApplicationID, mBuildType)
@@ -374,12 +378,12 @@ class MainActivity : AppCompatActivity(), IView, SwipeRefreshLayout.OnRefreshLis
             mApplicationList.clear()
             if (position == 0) {
                 mBuildType = null
-                binding.filterBuildType.isHighlight = false
+                binding.filterBuildType.setHighLight(false)
             } else {
-                mBuildType = entity.name
-                binding.filterBuildType.isHighlight = true
+                mBuildType = entity.buildType
+                binding.filterBuildType.setHighLight(true)
             }
-            binding.filterBuildType.setTitle(entity.name)
+            binding.filterBuildType.setTitle(entity.buildType)
             doFilter(mApplicationID, mBuildType)
             buildTypeBottomSheetDialog.dismiss()
         }

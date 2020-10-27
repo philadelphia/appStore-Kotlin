@@ -35,8 +35,8 @@ class CustomBottomSheetDialog : View {
     private val mAdapter: CustomRecyclerAdapter<ISelectable> by lazy {
         object : CustomRecyclerAdapter<ISelectable>(dataSource) {
             override fun convert(holder: CommonViewHolder, item: ISelectable, position: Int) {
-                holder.setChecked(R.id.tv_packageName, item.name == selectItemName)
-                holder.setText(R.id.tv_packageName, item.name)
+                holder.setChecked(R.id.tv_packageName, item.getName() == selectItemName)
+                holder.setText(R.id.tv_packageName, item.getName())
             }
 
             override fun getItemLayoutID(): Int {
@@ -71,7 +71,7 @@ class CustomBottomSheetDialog : View {
             OnRecyclerViewItemClickListener(binding.recyclerView) {
             override fun onItemClick(view: View, position: Int) {
                 val entity = dataSource[position]
-                selectItemName = entity.name
+                selectItemName = entity.getName()
                 onItemClickListener!!.ontItemClick(view, entity, position)
             }
 
@@ -108,7 +108,6 @@ class CustomBottomSheetDialog : View {
         dataSource.clear()
         dataSource.addAll(dataList)
         mAdapter.notifyDataSetChanged()
-
     }
 
 }

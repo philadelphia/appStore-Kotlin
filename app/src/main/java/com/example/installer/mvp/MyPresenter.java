@@ -80,6 +80,7 @@ import rx.subscriptions.CompositeSubscription;
 
         compositeSubscription.add(subscribe);
 
+
     }
 
     public void onDestroy() {

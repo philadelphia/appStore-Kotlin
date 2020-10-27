@@ -15,7 +15,7 @@ import com.example.installer.R;
 import com.example.installer.utils.SingleClick;
 import com.zhy.autolayout.AutoRelativeLayout;
 
-public class StatusLayout extends AutoRelativeLayout {
+public class StatusLayout1 extends AutoRelativeLayout {
 
 
     public static final int StateContent = -1, StateLoading = 0, StateError = 1, StateEmpty = 2, StateNoNet = 3;
@@ -24,6 +24,7 @@ public class StatusLayout extends AutoRelativeLayout {
      **/
     private View noNetwrokView, loadingView, loadingWrongView, noDataView;
     /***
+     *
      * 存放所有的布局文件
      **/
     private View mContentView;
@@ -32,15 +33,15 @@ public class StatusLayout extends AutoRelativeLayout {
      */
     private int mShowState = StateContent;
 
-    public StatusLayout(Context context) {
+    public StatusLayout1(Context context) {
         this(context, null);
     }
 
-    public StatusLayout(Context context, AttributeSet attrs) {
+    public StatusLayout1(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
-    public StatusLayout(Context context, AttributeSet attrs, int defStyleAttr) {
+    public StatusLayout1(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         TypedArray array = context.obtainStyledAttributes(attrs, R.styleable.StatusLayout, defStyleAttr, 0);
         try {
