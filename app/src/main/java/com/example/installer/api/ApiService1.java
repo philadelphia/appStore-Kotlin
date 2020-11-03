@@ -17,7 +17,7 @@ import rx.Observable;
  * Date: 2018/3/5.
  */
 
-public interface ApiService {
+public interface ApiService1 {
     /*获取所有APP列表*/
     @Headers("Cache-Control:0")
     @GET("/applicationClient/getApplications")

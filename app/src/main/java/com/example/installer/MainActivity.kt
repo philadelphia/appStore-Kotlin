@@ -1,7 +1,9 @@
 package com.example.installer
 
 import android.Manifest
+import android.app.Activity
 import android.app.AlertDialog
+import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.net.Uri
@@ -15,6 +17,7 @@ import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.Observer
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -26,10 +29,9 @@ import com.example.installer.entity.APKEntity
 import com.example.installer.entity.BuildType
 import com.example.installer.entity.ISelectable
 import com.example.installer.entity.PackageEntity
-import com.example.installer.mvp.MvpContract.IView
-import com.example.installer.mvp.MyPresenter
+import com.example.installer.mvvm.MainViewModel
 import com.example.installer.service.KtDownloadService
-import com.example.installer.utils.EndlessRecyclerOnScrollListener
+import com.example.installer.utils.CustomRecyclerOnScrollListener
 import com.example.installer.utils.NetWorkUtil
 import com.example.installer.view.CustomBottomSheetDialog
 import com.tbruyelle.rxpermissions.RxPermissions
@@ -37,16 +39,16 @@ import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 
-class MainActivity : AppCompatActivity(), IView, SwipeRefreshLayout.OnRefreshListener,
+
+class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
     CustomBottomSheetDialog.OnItemClickListener {
     private lateinit var binding: ActivityMainBinding
-    private lateinit var presenter: MyPresenter
+    private lateinit var mainViewModel: MainViewModel
     private val defaultSystemType = "android"
     private var mBuildType: String? = null
     private var mApplicationID: String? = null
     private var pageIndex = 1
     private val DEFAULT_PAGE_SIZE = 20
-    private var dataListSize = 0
     private val mPkgList: MutableList<PackageEntity> = ArrayList()
     private val mApplicationList: MutableList<APKEntity> = ArrayList()
     private val mBuildTypeList: MutableList<BuildType> = ArrayList()
@@ -70,7 +72,7 @@ class MainActivity : AppCompatActivity(), IView, SwipeRefreshLayout.OnRefreshLis
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        presenter = MyPresenter(this)
+        mainViewModel = MainViewModel()
         binding.swipeRefreshLayout.setOnRefreshListener(this)
         initData()
         requestPermissions()
@@ -89,16 +91,32 @@ class MainActivity : AppCompatActivity(), IView, SwipeRefreshLayout.OnRefreshLis
             ContextCompat.getColor(this, R.color.primaryColor)
         )
 
-        presenter.getApplicationList()
-        presenter.getPackageList(
+        binding.filterBuildType.setTitle("正式/测试")
+        binding.filterPackageName.setTitle("应用")
+
+        if (!NetWorkUtil.isNetConnected()) {
+            binding.statusLayout.showNoNetView()
+            binding.statusLayout.setNoNetClick { v ->
+                if (NetWorkUtil.isNetConnected()) {
+                    getData()
+                } else {
+                    openWiFiSetting(v.context)
+                }
+            }
+            return
+        }
+
+        getData()
+    }
+
+    private fun getData() {
+        mainViewModel.getApplicationList()
+        mainViewModel.getPackageList(
             defaultSystemType,
             mApplicationID,
             mBuildType,
             pageIndex
         )
-
-        binding.filterBuildType.setTitle("正式/测试")
-        binding.filterPackageName.setTitle("应用")
     }
 
     private fun showBuildTypeDialog(buildTypes: MutableList<BuildType>) {
@@ -113,19 +131,22 @@ class MainActivity : AppCompatActivity(), IView, SwipeRefreshLayout.OnRefreshLis
         packageBottomSheetDialog.setOnItemClickListener(this)
         if (mPkgList.size == 0) {
             packageBottomSheetDialog.showProgressBar(true)
-            presenter.getApplicationList()
+            mainViewModel.getApplicationList()
         }
     }
 
     private fun doFilter(application_id: String?, version_type: String?) {
         binding.swipeRefreshLayout.isRefreshing = true
         pageIndex = 1
-//        var sameApplication: Boolean = mBuildType?.equals(application_id)
-//        var sameBuildType: Boolean = mApplicationID?.equals(version_type)
-//        if (sameApplication && sameBuildType)
+        if (!NetWorkUtil.isNetConnected()) {
+            binding.statusLayout.showNoNetView()
+            return
+        }
+        mApplicationList.clear()
+        adapter?.notifyDataSetChanged()
         this.mBuildType = version_type
         this.mApplicationID = application_id
-        presenter.getPackageList(
+        mainViewModel.getPackageList(
             defaultSystemType,
             application_id,
             version_type,
@@ -137,6 +158,45 @@ class MainActivity : AppCompatActivity(), IView, SwipeRefreshLayout.OnRefreshLis
         mBuildTypeList.add(BuildType("全部"))
         mBuildTypeList.add(BuildType("正式"))
         mBuildTypeList.add(BuildType("测试"))
+
+        mainViewModel.getDialogEvent().observe(this, Observer { aBoolean ->
+            binding.swipeRefreshLayout.isRefreshing = aBoolean
+        })
+
+        mainViewModel.getErrorEvent().observe(this, Observer { errosMessage ->
+            onError(errosMessage)
+        })
+
+        mainViewModel.getApkList()
+            .observe(this@MainActivity, Observer { packageList ->
+                onLoadPackageListSuccess(packageList)
+            })
+
+        mainViewModel.getPackageListResult().observe(this, Observer { aBoolean ->
+            if (!aBoolean) {
+                onLoadApplicationListFailed()
+            }
+        })
+
+        mainViewModel.getPackageList().observe(this, Observer { packageList ->
+            onLoadApplicationListSuccess(packageList)
+        })
+
+        mainViewModel.getApplicationListResult().observe(
+            this, Observer { aBoolean ->
+                if (!aBoolean) {
+                    onLoadPackageListFailed()
+                }
+            })
+
+    }
+
+    private fun openWiFiSetting(context: Context?) {
+        val intent = Intent(Settings.ACTION_WIFI_SETTINGS)
+        if (context is Activity) {
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        }
+        context?.startActivity(intent)
     }
 
     private fun requestPermissions() {
@@ -162,33 +222,34 @@ class MainActivity : AppCompatActivity(), IView, SwipeRefreshLayout.OnRefreshLis
 
     override fun onResume() {
         super.onResume()
-        receiver = MyReceiver();
+        receiver = MyReceiver()
         val intentFilter = IntentFilter(KtDownloadService.BROADCAST_ACTION)
         intentFilter.addCategory(Intent.CATEGORY_DEFAULT)
         LocalBroadcastManager.getInstance(this).registerReceiver(receiver, intentFilter)
+
     }
 
     private fun initAdapter() {
         adapter = object : CustomRecyclerAdapter<APKEntity>(mApplicationList) {
-            override fun convert(holder: CommonViewHolder, apkEntity: APKEntity, position: Int) {
+            override fun convert(holder: CommonViewHolder, item: APKEntity, position: Int) {
                 Glide.with(holder.itemView.context)
-                    .load(apkEntity.icon_url)
+                    .load(item.icon_url)
                     .into(holder.getView(R.id.img_icon) as ImageView)
 
                 holder.setText(
                     R.id.tv_packageName,
-                    apkEntity.application_name.toString() + "(" + apkEntity.version_name + ")"
+                    item.application_name.toString() + "(" + item.version_name + ")"
                 )
 
                 val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd hh:mm:ss", Locale.getDefault())
                 val crateTime =
-                    simpleDateFormat.format(java.lang.Long.valueOf(apkEntity.create_time) * 1000)
+                    simpleDateFormat.format(java.lang.Long.valueOf(item.create_time) * 1000)
 
                 holder.setText(R.id.tv_timeStamp, crateTime)
 
-                if (!TextUtils.isEmpty(apkEntity.version_type) && apkEntity.version_type.equals("测试")) {
+                if (!TextUtils.isEmpty(item.version_type) && item.version_type.equals("测试")) {
                     holder.setVisible(R.id.tv_isDebugVersion, View.VISIBLE)
-                    holder.setText(R.id.tv_isDebugVersion, apkEntity.version_type)
+                    holder.setText(R.id.tv_isDebugVersion, item.version_type)
                 } else {
                     holder.setVisible(R.id.tv_isDebugVersion, View.INVISIBLE)
                 }
@@ -196,14 +257,14 @@ class MainActivity : AppCompatActivity(), IView, SwipeRefreshLayout.OnRefreshLis
                 holder.setOnClickListener(View.OnClickListener {
                     val toast: Toast = Toast.makeText(
                         this@MainActivity,
-                        apkEntity.application_name + apkEntity.version_name + apkEntity.version_type
+                        item.application_name + item.version_name + item.version_type
                             .toString() + "正在下载，请稍后.....",
                         Toast.LENGTH_LONG
                     )
                     toast.setGravity(Gravity.CENTER, 0, 0)
                     toast.show()
-                    val nameList: List<String>? = apkEntity.download_url?.split("/")
-                    downLoadAPK(apkEntity.download_url, nameList?.get(nameList?.size - 1))
+                    val nameList: List<String>? = item.download_url?.split("/")
+                    downLoadAPK(item.download_url, nameList?.get(nameList?.size - 1))
                 }, R.id.btn_downLoad)
             }
 
@@ -214,17 +275,18 @@ class MainActivity : AppCompatActivity(), IView, SwipeRefreshLayout.OnRefreshLis
             override fun getFootViewLayoutID(): Int {
                 return R.layout.layout_footer_view
             }
+
         }
 
         binding.recyclerView.layoutManager =
             LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         binding.recyclerView.adapter = adapter
         binding.recyclerView.setOnTouchListener { v, event -> binding.swipeRefreshLayout.isRefreshing }
-        binding.recyclerView.addOnScrollListener(object : EndlessRecyclerOnScrollListener() {
+        binding.recyclerView.addOnScrollListener(object : CustomRecyclerOnScrollListener() {
             override fun onLoadMore() {
-                if (adapter?.loadState != CustomRecyclerAdapter.LOADING_END) {
-                    adapter?.setLoadState(CustomRecyclerAdapter.LOADING)
-                    presenter.getPackageList(
+                if (adapter?.getState() != CustomRecyclerAdapter.LOADING_END) {
+                    adapter?.setState(CustomRecyclerAdapter.LOADING)
+                    mainViewModel.getPackageList(
                         defaultSystemType,
                         mApplicationID,
                         mBuildType,
@@ -235,23 +297,21 @@ class MainActivity : AppCompatActivity(), IView, SwipeRefreshLayout.OnRefreshLis
             }
 
             override fun setFlag(flag: Boolean) {
-                if (mApplicationList.size < dataListSize) {
-                    EndlessRecyclerOnScrollListener.flag = false
-                }
+
             }
         })
 
     }
 
     private fun downLoadAPK(url: String?, fileName: String?) {
-        val serviceIntent = Intent(this, KtDownloadService::class.java)
+        val serviceIntent = Intent(this, KtDownloadService.javaClass)
         serviceIntent.data = Uri.parse(url)
         serviceIntent.putExtra(KtDownloadService.FILE_NAME, fileName)
         serviceIntent.putExtra(KtDownloadService.DOWNLOAD_PATH, DOWNLOAD_PATH)
         KtDownloadService.enqueueWork(this, serviceIntent)
     }
 
-    override fun onLoadApplicationListSuccess(dataSource: Iterable<PackageEntity>) {
+    private fun onLoadApplicationListSuccess(dataSource: Iterable<PackageEntity>) {
         binding.swipeRefreshLayout.isRefreshing = false
         mPkgList.clear()
         val packageEntity = PackageEntity()
@@ -260,28 +320,38 @@ class MainActivity : AppCompatActivity(), IView, SwipeRefreshLayout.OnRefreshLis
         mPkgList.addAll(dataSource)
     }
 
-    override fun onLoadApplicationListFailed() {
+    private fun onLoadApplicationListFailed() {
         packageBottomSheetDialog.showProgressBar(false)
     }
 
-    override fun onLoadPackageListSuccess(dataSource: List<APKEntity>) {
+    private fun onLoadPackageListSuccess(dataSource: List<APKEntity>) {
+        showContentView()
         binding.swipeRefreshLayout.isRefreshing = false
         if (dataSource.size < DEFAULT_PAGE_SIZE) {
-            adapter?.setLoadState(CustomRecyclerAdapter.LOADING_END)
+            adapter?.setState(CustomRecyclerAdapter.LOADING_END)
+            CustomRecyclerOnScrollListener.flag = false
         } else {
-            adapter?.setLoadState(CustomRecyclerAdapter.LOADING_COMPLETE)
+            adapter?.setState(CustomRecyclerAdapter.LOADING_COMPLETE)
             pageIndex++
         }
 
         mApplicationList.addAll(dataSource)
+        if (mApplicationList?.isEmpty()) {
+            showEmptyView()
+        } else {
+            showContentView()
+        }
         adapter?.notifyItemRangeInserted(mApplicationList.size, dataSource.size)
 
     }
 
-    override fun onLoadPackageListFailed() {
-        adapter!!.setLoadState(CustomRecyclerAdapter.LOADING_COMPLETE)
+    private fun onLoadPackageListFailed() {
+        adapter!!.setState(CustomRecyclerAdapter.LOADING_COMPLETE)
+        if (mPkgList?.size == 0) {
+            binding.statusLayout.showEmptyView()
+        }
         binding.statusLayout.setEmptyClick {
-            presenter.getPackageList(
+            mainViewModel.getPackageList(
                 defaultSystemType,
                 mApplicationID,
                 mBuildType,
@@ -290,15 +360,12 @@ class MainActivity : AppCompatActivity(), IView, SwipeRefreshLayout.OnRefreshLis
         }
     }
 
-    override fun notifyDataSize(count: Int) {
-        dataListSize = count
-    }
 
-    override fun showContentView() {
+    private fun showContentView() {
         binding.statusLayout.showContentView()
     }
 
-    override fun showErrorView() {
+    private fun showErrorView() {
         binding.statusLayout.showErrorView()
         if (binding.swipeRefreshLayout.isRefreshing) {
             binding.swipeRefreshLayout.isRefreshing = false
@@ -307,7 +374,7 @@ class MainActivity : AppCompatActivity(), IView, SwipeRefreshLayout.OnRefreshLis
         binding.statusLayout.setErrorClick {
             binding.statusLayout.showContentView()
             binding.swipeRefreshLayout.isRefreshing = true
-            presenter.getPackageList(
+            mainViewModel.getPackageList(
                 defaultSystemType,
                 mApplicationID,
                 mBuildType,
@@ -316,14 +383,14 @@ class MainActivity : AppCompatActivity(), IView, SwipeRefreshLayout.OnRefreshLis
         }
     }
 
-    override fun showEmptyView() {
+    private fun showEmptyView() {
         binding.statusLayout.showEmptyView()
         if (binding.swipeRefreshLayout.isRefreshing) {
             binding.swipeRefreshLayout.isRefreshing = false
         }
     }
 
-    override fun checkNetWork() {
+    private fun checkNetWork() {
         if (!NetWorkUtil.isNetConnected()) {
             val builder = AlertDialog.Builder(this)
                 .setTitle("alert")
@@ -344,7 +411,7 @@ class MainActivity : AppCompatActivity(), IView, SwipeRefreshLayout.OnRefreshLis
         }
     }
 
-    override fun onError(message: String?) {
+    private fun onError(message: String?) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 
@@ -352,7 +419,7 @@ class MainActivity : AppCompatActivity(), IView, SwipeRefreshLayout.OnRefreshLis
         mApplicationList.clear()
         adapter!!.notifyItemMoved(0, mApplicationList.size)
         pageIndex = 1
-        presenter.getPackageList(
+        mainViewModel.getPackageList(
             defaultSystemType,
             mApplicationID,
             mBuildType,
@@ -361,7 +428,6 @@ class MainActivity : AppCompatActivity(), IView, SwipeRefreshLayout.OnRefreshLis
     }
 
     override fun ontItemClick(view: View?, entity: ISelectable?, position: Int) {
-        mApplicationList.clear()
         if (entity is PackageEntity) {
             if (position == 0) {
                 mApplicationID = null

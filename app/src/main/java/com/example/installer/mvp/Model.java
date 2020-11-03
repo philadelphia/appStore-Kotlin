@@ -19,12 +19,12 @@ import rx.Observable;
 public class Model implements MvpContract.IModel {
     @Override
     public Observable<Result<List<PackageEntity>>> getApplicationList() {
-        return ApiServiceUtil.getApplicationList().compose(RxsRxSchedulers.<Result<List<PackageEntity>>>io_main());
+        return ApiServiceUtil.getApplicationList().compose(RxsRxSchedulers.io_main());
     }
 
     @Override
     public Observable<Result<List<APKEntity>>> getPackageList(String system_name, String application_id, String version_type, int pageIndex) {
-        return ApiServiceUtil.getPackageList(system_name, application_id, version_type, pageIndex).compose(RxsRxSchedulers.<Result<List<APKEntity>>>io_main());
+        return ApiServiceUtil.getPackageList(system_name, application_id, version_type, pageIndex).compose(RxsRxSchedulers.io_main());
     }
 
 }

@@ -3,6 +3,7 @@ package com.example.installer
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
+import android.os.Looper
 import android.view.KeyEvent
 import android.view.WindowManager
 import android.widget.RelativeLayout
@@ -39,7 +40,7 @@ class WelcomeActivity : AppCompatActivity() {
         layoutParams.topMargin = (DisplayUtil.getWindowHight(this) * 0.3).toInt()
         binding.imgIcon.layoutParams = layoutParams
 
-        Handler().postDelayed(Runnable {
+        Handler(Looper.getMainLooper()).postDelayed(Runnable {
             val intent = Intent(this@WelcomeActivity, MainActivity::class.java)
             startActivity(intent)
             finish()

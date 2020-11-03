@@ -17,11 +17,11 @@ class KtDownloadService : JobIntentService() {
 
 
     companion object {
-        val FILE_NAME = "fileName"
-        val DOWNLOAD_PATH = "download_path"
-        val BROADCAST_ACTION = "com.meiliwu.installer.service.BROADCAST"
-        val EXTENDED_DATA_STATUS = "com.meiliwu.installer.service.STATUS"
-        val JOB_ID = 1
+        const val FILE_NAME = "fileName"
+        const val DOWNLOAD_PATH = "download_path"
+        const val BROADCAST_ACTION = "com.meiliwu.installer.service.BROADCAST"
+        const val EXTENDED_DATA_STATUS = "com.meiliwu.installer.service.STATUS"
+        const val JOB_ID = 1
 
         fun enqueueWork(context: Context, work: Intent) {
             enqueueWork(
@@ -71,7 +71,7 @@ class KtDownloadService : JobIntentService() {
             while (isGoing) {
                 val cursor: Cursor = downLoadService.query(query)
 
-                if (cursor != null && cursor.moveToFirst()) {
+                if (cursor?.moveToFirst()) {
                     val status = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS))
                     when (status) {
                         DownloadManager.STATUS_SUCCESSFUL -> {

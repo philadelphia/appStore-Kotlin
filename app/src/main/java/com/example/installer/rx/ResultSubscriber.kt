@@ -1,4 +1,4 @@
-package com.example.installer.mvp
+package com.example.installer.rx
 
 import android.util.Log
 import com.example.installer.entity.Result
@@ -18,7 +18,9 @@ abstract class ResultSubscriber<T>() : Subscriber<Result<T>>() {
                 Log.i(TAG, "onError: http exception")
                 onError(e.message)
             }
-
+            else -> {
+                Log.i(TAG, "onError: 其他 错误")
+            }
         }
     }
 

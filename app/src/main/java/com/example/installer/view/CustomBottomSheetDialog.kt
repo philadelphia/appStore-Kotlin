@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.example.installer.R
 import com.example.installer.adapter.CommonViewHolder
 import com.example.installer.adapter.CustomItemDecoration
-import com.example.installer.adapter.CustomRecyclerAdapter
+import com.example.installer.adapter.KtBottomSheetRecyclerAdapter
 import com.example.installer.adapter.OnRecyclerViewItemClickListener
 import com.example.installer.databinding.LayoutBottomSheetDialogBinding
 import com.example.installer.entity.ISelectable
@@ -32,8 +32,9 @@ class CustomBottomSheetDialog : View {
         BottomSheetDialog(context)
     }
 
-    private val mAdapter: CustomRecyclerAdapter<ISelectable> by lazy {
-        object : CustomRecyclerAdapter<ISelectable>(dataSource) {
+    private val mAdapter: KtBottomSheetRecyclerAdapter<ISelectable> by lazy {
+        object : KtBottomSheetRecyclerAdapter<ISelectable>(dataSource) {
+
             override fun convert(holder: CommonViewHolder, item: ISelectable, position: Int) {
                 holder.setChecked(R.id.tv_packageName, item.getName() == selectItemName)
                 holder.setText(R.id.tv_packageName, item.getName())
@@ -41,10 +42,6 @@ class CustomBottomSheetDialog : View {
 
             override fun getItemLayoutID(): Int {
                 return R.layout.layout_bottom_sheet_dialog_item
-            }
-
-            override fun getFootViewLayoutID(): Int {
-                return R.layout.layout_footer_view
             }
         }
     }
@@ -67,26 +64,27 @@ class CustomBottomSheetDialog : View {
             GridLayoutManager(this@CustomBottomSheetDialog.context, 2)
         binding.recyclerView.addItemDecoration(CustomItemDecoration(2))
         binding.recyclerView.adapter = mAdapter
-        binding.recyclerView.addOnItemTouchListener(object :
-            OnRecyclerViewItemClickListener(binding.recyclerView) {
-            override fun onItemClick(view: View, position: Int) {
-                val entity = dataSource[position]
-                selectItemName = entity.getName()
-                onItemClickListener!!.ontItemClick(view, entity, position)
-            }
+        binding.recyclerView.addOnItemTouchListener(
+            object : OnRecyclerViewItemClickListener(binding.recyclerView) {
+                override fun onItemClick(view: View?, position: Int) {
+                    val entity = dataSource[position]
+                    selectItemName = entity.getName()
+                    onItemClickListener!!.ontItemClick(view, entity, position)
+                }
 
-            override fun onItemLongClick(view: View, position: Int) {}
-        })
+                override fun onItemLongClick(view: View?, position: Int) {}
+            })
+
     }
 
     fun show() {
-        if (bottomSheetDialog != null && !bottomSheetDialog.isShowing) {
+        if (!bottomSheetDialog?.isShowing) {
             bottomSheetDialog.show()
         }
     }
 
     fun dismiss() {
-        if (bottomSheetDialog.isShowing) {
+        if (bottomSheetDialog?.isShowing) {
             bottomSheetDialog.dismiss()
         }
     }
