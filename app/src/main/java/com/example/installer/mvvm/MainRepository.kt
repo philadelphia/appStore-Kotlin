@@ -1,9 +1,10 @@
-package com.example.installer.utils
+package com.example.installer.mvvm
 
-import com.example.installer.api.APIService
 import com.example.installer.entity.APKEntity
 import com.example.installer.entity.KtResult
 import com.example.installer.entity.PackageEntity
+import com.example.installer.utils.ApiServiceUtil
+import com.example.installer.utils.RxsRxSchedulers
 import rx.Observable
 
 /**
@@ -11,35 +12,29 @@ import rx.Observable
 @date   2020/11/3
 
  **/
-class ApiServiceUtil {
+class MainRepository {
     companion object {
-        private var retrofitUtil: RetrofitUtil? = null
-        private var mApiService: APIService? = null
-
-        init {
-            retrofitUtil = RetrofitUtil.getInstance()
-            mApiService = retrofitUtil!!.createService(APIService::class.java)
-        }
-
-
         @JvmStatic
         fun getApplicationList(): Observable<KtResult<List<PackageEntity>?>?> {
-            return mApiService!!.getApplicationList()
+            return ApiServiceUtil.getApplicationList().compose(RxsRxSchedulers.io_main())
         }
 
         @JvmStatic
         fun getPackageList(
             system_name: String?,
+
             application_id: String?,
+
             version_type: String?,
+
             pageIndex: Int
         ): Observable<KtResult<List<APKEntity>?>?> {
-            return mApiService!!.getPackageList(
+            return ApiServiceUtil.getPackageList(
                 system_name,
                 application_id,
                 version_type,
                 pageIndex
-            )
+            ).compose(RxsRxSchedulers.io_main())
         }
     }
 }

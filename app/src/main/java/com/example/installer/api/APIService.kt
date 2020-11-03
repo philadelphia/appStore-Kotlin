@@ -1,8 +1,8 @@
 package com.example.installer.api
 
 import com.example.installer.entity.APKEntity
+import com.example.installer.entity.KtResult
 import com.example.installer.entity.PackageEntity
-import com.example.installer.entity.Result
 import retrofit2.http.GET
 import retrofit2.http.Headers
 import retrofit2.http.Query
@@ -17,7 +17,7 @@ interface APIService {
     /*获取所有APP列表*/
     @Headers("Cache-Control:0")
     @GET("/applicationClient/getApplications")
-    fun getApplicationList(): Observable<Result<List<PackageEntity?>?>?>?
+    fun getApplicationList(): Observable<KtResult<List<PackageEntity>?>?>
 
     /*获取指定平台的特定APK(release/debug)列表*/
     @Headers("Cache-Control:0")
@@ -27,6 +27,6 @@ interface APIService {
         @Query("application_id") application_id: String?,
         @Query("version_type") version_type: String?,
         @Query("page") pageIndex: Int
-    ): Observable<Result<List<APKEntity?>?>?>?
+    ): Observable<KtResult<List<APKEntity>?>?>
 
 }

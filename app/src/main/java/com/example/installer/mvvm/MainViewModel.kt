@@ -3,10 +3,9 @@ package com.example.installer.mvvm
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.installer.entity.APKEntity
+import com.example.installer.entity.KtResult
 import com.example.installer.entity.PackageEntity
-import com.example.installer.entity.Result
-import com.example.installer.mvp.Model
-import com.example.installer.rx.RxErrorHandlerSubscriber
+import com.example.installer.rx.ResultSubscriber
 import rx.Observable
 import rx.Subscription
 import rx.subscriptions.CompositeSubscription
@@ -31,20 +30,21 @@ class MainViewModel : ViewModel() {
 
 
     fun getApplicationList() {
-        val observable: Observable<Result<List<PackageEntity>>> = Model().getApplicationList()
+        val observable: Observable<KtResult<List<PackageEntity>?>?> =
+            MainRepository.getApplicationList()
         val subscribe: Subscription =
-            observable.subscribe(object : RxErrorHandlerSubscriber<List<PackageEntity>>() {
+            observable.subscribe(object : ResultSubscriber<List<PackageEntity>?>() {
                 override fun onStart() {
                     super.onStart()
                     dialogEvent.value = true
                 }
 
-                override fun onSuccess(data: List<PackageEntity>) {
+                override fun onSuccess(data: List<PackageEntity>?) {
                     dialogEvent.value = false
                     packageList.value = data
                 }
 
-                override fun onError(message: String) {
+                override fun onError(message: String?) {
                     dialogEvent.value = false
                     errorEvent.value = message
                     applicationListResult.value = false;
@@ -63,10 +63,11 @@ class MainViewModel : ViewModel() {
 
         pageIndex: Int
     ) {
-        var packageList =
-            Model().getPackageList(system_name, application_id, version_type, pageIndex)
+        var packageList:Observable<KtResult<List<APKEntity>?>?> =
+            MainRepository.getPackageList(system_name, application_id, version_type, pageIndex)
+
         var subscribe = packageList.subscribe(object :
-            RxErrorHandlerSubscriber<List<APKEntity>>() {
+            ResultSubscriber<List<APKEntity>?>() {
             override fun onSuccess(data: List<APKEntity>?) {
                 dialogEvent.value = false
                 apkList.value = data
