@@ -2,9 +2,9 @@ package com.example.installer.mvvm
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.installer.entity.APKEntity
-import com.example.installer.entity.KtResult
 import com.example.installer.entity.PackageEntity
+import com.example.installer.entity.ProductEntity
+import com.example.installer.entity.Result
 import com.example.installer.rx.ResultSubscriber
 import rx.Observable
 import rx.Subscription
@@ -16,32 +16,29 @@ import rx.subscriptions.CompositeSubscription
 
  **/
 class MainViewModel : ViewModel() {
-    private val apkList: MutableLiveData<List<APKEntity>> = MutableLiveData()
-    private val packageList: MutableLiveData<List<PackageEntity>> = MutableLiveData()
+    private val packageList: MutableLiveData<List<PackageEntity>?> = MutableLiveData()
+    private val productList: MutableLiveData<List<ProductEntity>?> = MutableLiveData()
     private val dialogEvent: MutableLiveData<Boolean> = MutableLiveData()
     private val errorEvent: MutableLiveData<String?> = MutableLiveData()
     private val packageListResult = MutableLiveData<Boolean>()
     private val applicationListResult = MutableLiveData<Boolean>()
-    private var compositeSubscription: CompositeSubscription
-
-    init {
-        compositeSubscription = CompositeSubscription()
+    private val compositeSubscription: CompositeSubscription by lazy {
+        CompositeSubscription()
     }
 
-
-    fun getApplicationList() {
-        val observable: Observable<KtResult<List<PackageEntity>?>?> =
-            MainRepository.getApplicationList()
+    fun getProductList(){
+        val observable: Observable<Result<List<ProductEntity>>> =
+            MainRepository.getProductList()
         val subscribe: Subscription =
-            observable.subscribe(object : ResultSubscriber<List<PackageEntity>?>() {
+            observable.subscribe(object : ResultSubscriber<List<ProductEntity>>() {
                 override fun onStart() {
                     super.onStart()
                     dialogEvent.value = true
                 }
 
-                override fun onSuccess(data: List<PackageEntity>?) {
+                override fun onSuccess(data: List<ProductEntity>?) {
                     dialogEvent.value = false
-                    packageList.value = data
+                    productList.value = data
                 }
 
                 override fun onError(message: String?) {
@@ -54,7 +51,7 @@ class MainViewModel : ViewModel() {
     }
 
 
-    fun getPackageList(
+    fun getProductList(
         system_name: String?,
 
         application_id: String?,
@@ -63,14 +60,14 @@ class MainViewModel : ViewModel() {
 
         pageIndex: Int
     ) {
-        var packageList:Observable<KtResult<List<APKEntity>?>?> =
+        var observable: Observable<Result<List<PackageEntity>>> =
             MainRepository.getPackageList(system_name, application_id, version_type, pageIndex)
 
-        var subscribe = packageList.subscribe(object :
-            ResultSubscriber<List<APKEntity>?>() {
-            override fun onSuccess(data: List<APKEntity>?) {
+        var subscribe = observable.subscribe(object :
+            ResultSubscriber<List<PackageEntity>>() {
+            override fun onSuccess(data: List<PackageEntity>?) {
                 dialogEvent.value = false
-                apkList.value = data
+                packageList.value = data
             }
 
             override fun onError(message: String?) {
@@ -83,8 +80,8 @@ class MainViewModel : ViewModel() {
         compositeSubscription.add(subscribe);
     }
 
-    fun getApkList(): MutableLiveData<List<APKEntity>> {
-        return apkList
+    fun getPackageListLiveData(): MutableLiveData<List<PackageEntity>?> {
+        return packageList
     }
 
     fun getDialogEvent(): MutableLiveData<Boolean> {
@@ -95,10 +92,9 @@ class MainViewModel : ViewModel() {
         return errorEvent
     }
 
-    fun getPackageList(): MutableLiveData<List<PackageEntity>> {
-        return packageList
+    fun getProductListLiveData(): MutableLiveData<List<ProductEntity>?> {
+        return productList
     }
-
 
     fun getPackageListResult(): MutableLiveData<Boolean> {
         return packageListResult

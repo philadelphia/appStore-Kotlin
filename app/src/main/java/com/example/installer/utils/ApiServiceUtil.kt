@@ -1,9 +1,9 @@
 package com.example.installer.utils
 
 import com.example.installer.api.APIService
-import com.example.installer.entity.APKEntity
-import com.example.installer.entity.KtResult
 import com.example.installer.entity.PackageEntity
+import com.example.installer.entity.ProductEntity
+import com.example.installer.entity.Result
 import rx.Observable
 
 /**
@@ -13,28 +13,21 @@ import rx.Observable
  **/
 class ApiServiceUtil {
     companion object {
-        private var retrofitUtil: RetrofitUtil? = null
-        private var mApiService: APIService? = null
-
-        init {
-            retrofitUtil = RetrofitUtil.getInstance()
-            mApiService = retrofitUtil!!.createService(APIService::class.java)
+        private val mApiService by lazy {
+            RetrofitUtil.getInstance().createService(APIService::class.java)
         }
 
-
-        @JvmStatic
-        fun getApplicationList(): Observable<KtResult<List<PackageEntity>?>?> {
-            return mApiService!!.getApplicationList()
+        fun getProductList(): Observable<Result<List<ProductEntity>>> {
+            return mApiService.getProductList()
         }
 
-        @JvmStatic
         fun getPackageList(
             system_name: String?,
             application_id: String?,
             version_type: String?,
             pageIndex: Int
-        ): Observable<KtResult<List<APKEntity>?>?> {
-            return mApiService!!.getPackageList(
+        ): Observable<Result<List<PackageEntity>>> {
+            return mApiService.getPackageList(
                 system_name,
                 application_id,
                 version_type,

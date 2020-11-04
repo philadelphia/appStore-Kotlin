@@ -174,7 +174,7 @@ public class StatusLayout1 extends AutoRelativeLayout {
      * @param pClick 点击回调
      */
     public void setNoNetClick(OnClickListener pClick) {
-        if (SingleClick.isSingle(2000)) {
+        if (SingleClick.Companion.isSingle(2000)) {
             if (noNetwrokView == null) {
                 throw new NullPointerException("view not inflate");
             }
@@ -198,7 +198,7 @@ public class StatusLayout1 extends AutoRelativeLayout {
      * @param pClick 回调
      */
     public void setLoadingClick(OnClickListener pClick) {
-        if (SingleClick.isSingle(2000)) {
+        if (SingleClick.Companion.isSingle(2000)) {
             if (pClick != null) {
                 if (loadingView == null) {
                     throw new NullPointerException("view not inflate");
@@ -214,7 +214,7 @@ public class StatusLayout1 extends AutoRelativeLayout {
      * @param pClick 点击回调
      */
     public void setErrorClick(OnClickListener pClick) {
-        if (SingleClick.isSingle(2000)) {
+        if (SingleClick.Companion.isSingle(2000)) {
             if (pClick != null) {
                 if (loadingWrongView == null) {
                     throw new NullPointerException("view not inflate");
@@ -230,7 +230,7 @@ public class StatusLayout1 extends AutoRelativeLayout {
      * @param pClick 点击回调
      */
     public void setEmptyClick(OnClickListener pClick) {
-        if (SingleClick.isSingle(2000)) {
+        if (SingleClick.Companion.isSingle(2000)) {
             if (pClick != null) {
                 if (noDataView == null) {
                     throw new NullPointerException("view not inflate");

@@ -5,10 +5,10 @@ package com.example.installer.entity
 @date   2020/11/3
 
  **/
-class KtResult<T> {
+class Result<T> {
     var code = 0
     var message: String? = null
-    val data: ResultBean<T>? = null
+    var data: ResultBean<T>? = null
 
 
 

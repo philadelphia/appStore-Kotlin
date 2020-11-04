@@ -1,7 +1,7 @@
 package com.example.installer.rx
 
 import android.util.Log
-import com.example.installer.entity.KtResult
+import com.example.installer.entity.Result
 import retrofit2.HttpException
 import rx.Subscriber
 
@@ -10,9 +10,9 @@ import rx.Subscriber
 @date   2020/10/23
 
  **/
-abstract class ResultSubscriber<T>() : Subscriber<KtResult<T>>() {
+abstract class ResultSubscriber<T> : Subscriber<Result<T>>() {
     private val TAG = "ResultSubscriber"
-    override fun onError(e: Throwable?) {
+    override fun onError(e: Throwable) {
         when {
             e is HttpException -> {
                 Log.i(TAG, "onError: http exception")
@@ -22,19 +22,19 @@ abstract class ResultSubscriber<T>() : Subscriber<KtResult<T>>() {
             }
 
         }
-        onError(e?.message)
+        onError(e.message)
     }
 
-    override fun onNext(result: KtResult<T>) {
-        if (result?.code == 0) {
+    override fun onNext(result: Result<T>) {
+        if (result.code == 0) {
             onSuccess(result.data?.data as T)
         } else {
-            onError(result?.message)
+            onError(result.message)
         }
     }
 
     override fun onCompleted() {}
 
-    abstract fun onSuccess(t: T)
+    abstract fun onSuccess(t: T?)
     abstract fun onError(message: String?)
 }

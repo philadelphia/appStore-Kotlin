@@ -10,6 +10,7 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
+import java.io.Serializable
 import java.util.concurrent.TimeUnit
 
 /**
@@ -17,27 +18,19 @@ import java.util.concurrent.TimeUnit
 @date   2020/11/3
 
  **/
-class RetrofitUtil {
-    companion object{
-        @Volatile
-        private var instance: RetrofitUtil? = null
-
-        /*缓存最大容量为10M*/
-        const val MAX_CACHE_SIZE = 10 * 1024 * 1024
-
-        @JvmStatic
-        fun getInstance(): RetrofitUtil? {
-            if (instance == null) {
-                synchronized(RetrofitUtil::class.java) {
-                    if (instance == null) {
-                        instance = RetrofitUtil()
-                    }
-                }
-            }
-            return instance
+class RetrofitUtil private constructor() : Serializable {
+    companion object {
+        fun getInstance(): RetrofitUtil {
+            return SingletonHolder.instance
         }
-
     }
+
+    private object SingletonHolder {
+        val instance: RetrofitUtil = RetrofitUtil()
+    }
+
+    /*缓存最大容量为10M*/
+    val MAX_CACHE_SIZE = 10 * 1024 * 1024
 
     private fun getOkHttpClient(): OkHttpClient? {
         return OkHttpClient.Builder()
@@ -65,4 +58,12 @@ class RetrofitUtil {
             .build()
         return retrofit.create(service)
     }
+
+
+    private fun readResolve(): Any {
+        //防止单例对象在反序列化时重新生成对象
+        //由于反序列化时会调用readResolve这个钩子方法，只需要把当前的RetrofitUtil对象返回而不是去创建一个新的对象
+        return RetrofitUtil
+    }
+
 }

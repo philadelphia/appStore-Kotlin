@@ -9,7 +9,6 @@ class SingleClick {
     companion object{
         private var lastTime: Long = 0
 
-        @JvmStatic
         fun isSingle(defalutTime: Long): Boolean {
             val currentTime = System.currentTimeMillis()
             val isSign = if (currentTime - lastTime <= defalutTime) false else true

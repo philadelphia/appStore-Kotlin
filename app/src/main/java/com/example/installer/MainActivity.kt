@@ -25,10 +25,10 @@ import com.bumptech.glide.Glide
 import com.example.installer.adapter.CommonViewHolder
 import com.example.installer.adapter.CustomRecyclerAdapter
 import com.example.installer.databinding.ActivityMainBinding
-import com.example.installer.entity.APKEntity
 import com.example.installer.entity.BuildType
 import com.example.installer.entity.ISelectable
 import com.example.installer.entity.PackageEntity
+import com.example.installer.entity.ProductEntity
 import com.example.installer.mvvm.MainViewModel
 import com.example.installer.service.KtDownloadService
 import com.example.installer.utils.CustomRecyclerOnScrollListener
@@ -49,10 +49,10 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
     private var mApplicationID: String? = null
     private var pageIndex = 1
     private val DEFAULT_PAGE_SIZE = 20
-    private val mPkgList: MutableList<PackageEntity> = ArrayList()
-    private val mApplicationList: MutableList<APKEntity> = ArrayList()
+    private val mProductList: MutableList<ProductEntity> = ArrayList()
+    private val mPackageList: MutableList<PackageEntity> = ArrayList()
     private val mBuildTypeList: MutableList<BuildType> = ArrayList()
-    private var adapter: CustomRecyclerAdapter<APKEntity>? = null
+    private var adapter: CustomRecyclerAdapter<PackageEntity>? = null
 
     private val packageBottomSheetDialog: CustomBottomSheetDialog by lazy {
         CustomBottomSheetDialog(this)
@@ -81,7 +81,7 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
         binding.filterBuildType.setOnClickListener { showBuildTypeDialog(mBuildTypeList) }
 
         binding.filterPackageName.setOnClickListener({
-            showApkNameDialog(mPkgList)
+            showApkNameDialog(mProductList)
         })
 
         //请求数据
@@ -110,8 +110,8 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
     }
 
     private fun getData() {
-        mainViewModel.getApplicationList()
-        mainViewModel.getPackageList(
+        mainViewModel.getProductList()
+        mainViewModel.getProductList(
             defaultSystemType,
             mApplicationID,
             mBuildType,
@@ -125,13 +125,13 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
         buildTypeBottomSheetDialog.setOnItemClickListener(this)
     }
 
-    private fun showApkNameDialog(dataSource: MutableList<PackageEntity>) {
+    private fun showApkNameDialog(dataSource: MutableList<ProductEntity>) {
         packageBottomSheetDialog.setDataList(dataSource)
         packageBottomSheetDialog.show()
         packageBottomSheetDialog.setOnItemClickListener(this)
-        if (mPkgList.size == 0) {
+        if (mProductList.size == 0) {
             packageBottomSheetDialog.showProgressBar(true)
-            mainViewModel.getApplicationList()
+            mainViewModel.getProductList()
         }
     }
 
@@ -142,11 +142,11 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
             binding.statusLayout.showNoNetView()
             return
         }
-        mApplicationList.clear()
+        mPackageList.clear()
         adapter?.notifyDataSetChanged()
         this.mBuildType = version_type
         this.mApplicationID = application_id
-        mainViewModel.getPackageList(
+        mainViewModel.getProductList(
             defaultSystemType,
             application_id,
             version_type,
@@ -167,7 +167,7 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
             onError(errosMessage)
         })
 
-        mainViewModel.getApkList()
+        mainViewModel.getPackageListLiveData()
             .observe(this@MainActivity, Observer { packageList ->
                 onLoadPackageListSuccess(packageList)
             })
@@ -178,8 +178,8 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
             }
         })
 
-        mainViewModel.getPackageList().observe(this, Observer { packageList ->
-            onLoadApplicationListSuccess(packageList)
+        mainViewModel.getProductListLiveData().observe(this, Observer { packageList ->
+            onLoadProductListSuccess(packageList)
         })
 
         mainViewModel.getApplicationListResult().observe(
@@ -230,8 +230,8 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
     }
 
     private fun initAdapter() {
-        adapter = object : CustomRecyclerAdapter<APKEntity>(mApplicationList) {
-            override fun convert(holder: CommonViewHolder, item: APKEntity, position: Int) {
+        adapter = object : CustomRecyclerAdapter<PackageEntity>(mPackageList) {
+            override fun convert(holder: CommonViewHolder, item: PackageEntity, position: Int) {
                 Glide.with(holder.itemView.context)
                     .load(item.icon_url)
                     .into(holder.getView(R.id.img_icon) as ImageView)
@@ -286,7 +286,7 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
             override fun onLoadMore() {
                 if (adapter?.getState() != CustomRecyclerAdapter.LOADING_END) {
                     adapter?.setState(CustomRecyclerAdapter.LOADING)
-                    mainViewModel.getPackageList(
+                    mainViewModel.getProductList(
                         defaultSystemType,
                         mApplicationID,
                         mBuildType,
@@ -311,47 +311,56 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
         KtDownloadService.enqueueWork(this, serviceIntent)
     }
 
-    private fun onLoadApplicationListSuccess(dataSource: Iterable<PackageEntity>) {
+    private fun onLoadProductListSuccess(dataSource: List<ProductEntity>?) {
         binding.swipeRefreshLayout.isRefreshing = false
-        mPkgList.clear()
-        val packageEntity = PackageEntity()
+        mProductList.clear()
+        val packageEntity = ProductEntity()
         packageEntity.application_name = "全部"
-        mPkgList.add(0, packageEntity)
-        mPkgList.addAll(dataSource)
+        mProductList.add(0, packageEntity)
+        dataSource?.let {
+            mProductList.addAll(dataSource)
+        }
+//        if (dataSource != null) {
+//            mProductList.addAll(dataSource)
+//        }
     }
 
     private fun onLoadApplicationListFailed() {
         packageBottomSheetDialog.showProgressBar(false)
     }
 
-    private fun onLoadPackageListSuccess(dataSource: List<APKEntity>) {
+    private fun onLoadPackageListSuccess(dataSource: List<PackageEntity>?) {
         showContentView()
         binding.swipeRefreshLayout.isRefreshing = false
-        if (dataSource.size < DEFAULT_PAGE_SIZE) {
-            adapter?.setState(CustomRecyclerAdapter.LOADING_END)
-            CustomRecyclerOnScrollListener.flag = false
-        } else {
-            adapter?.setState(CustomRecyclerAdapter.LOADING_COMPLETE)
-            pageIndex++
+        dataSource?.let {
+            if (dataSource?.size < DEFAULT_PAGE_SIZE) {
+                adapter?.setState(CustomRecyclerAdapter.LOADING_END)
+                CustomRecyclerOnScrollListener.flag = false
+            } else {
+                adapter?.setState(CustomRecyclerAdapter.LOADING_COMPLETE)
+                pageIndex++
+            }
+
+            mPackageList.addAll(dataSource)
+            adapter?.notifyItemRangeInserted(mPackageList.size, dataSource.size)
         }
 
-        mApplicationList.addAll(dataSource)
-        if (mApplicationList?.isEmpty()) {
+
+        if (mPackageList.isEmpty()) {
             showEmptyView()
         } else {
             showContentView()
         }
-        adapter?.notifyItemRangeInserted(mApplicationList.size, dataSource.size)
 
     }
 
     private fun onLoadPackageListFailed() {
         adapter!!.setState(CustomRecyclerAdapter.LOADING_COMPLETE)
-        if (mPkgList?.size == 0) {
+        if (mProductList?.size == 0) {
             binding.statusLayout.showEmptyView()
         }
         binding.statusLayout.setEmptyClick {
-            mainViewModel.getPackageList(
+            mainViewModel.getProductList(
                 defaultSystemType,
                 mApplicationID,
                 mBuildType,
@@ -374,7 +383,7 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
         binding.statusLayout.setErrorClick {
             binding.statusLayout.showContentView()
             binding.swipeRefreshLayout.isRefreshing = true
-            mainViewModel.getPackageList(
+            mainViewModel.getProductList(
                 defaultSystemType,
                 mApplicationID,
                 mBuildType,
@@ -416,10 +425,10 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
     }
 
     override fun onRefresh() {
-        mApplicationList.clear()
-        adapter!!.notifyItemMoved(0, mApplicationList.size)
+        mPackageList.clear()
+        adapter!!.notifyItemMoved(0, mPackageList.size)
         pageIndex = 1
-        mainViewModel.getPackageList(
+        mainViewModel.getProductList(
             defaultSystemType,
             mApplicationID,
             mBuildType,
@@ -428,7 +437,7 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
     }
 
     override fun ontItemClick(view: View?, entity: ISelectable?, position: Int) {
-        if (entity is PackageEntity) {
+        if (entity is ProductEntity) {
             if (position == 0) {
                 mApplicationID = null
                 binding.filterPackageName.setHighLight(false)
@@ -441,7 +450,7 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
             packageBottomSheetDialog.dismiss()
 
         } else if (entity is BuildType) {
-            mApplicationList.clear()
+            mPackageList.clear()
             if (position == 0) {
                 mBuildType = null
                 binding.filterBuildType.setHighLight(false)

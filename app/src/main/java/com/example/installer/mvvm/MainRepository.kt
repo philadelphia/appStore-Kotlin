@@ -1,8 +1,8 @@
 package com.example.installer.mvvm
 
-import com.example.installer.entity.APKEntity
-import com.example.installer.entity.KtResult
 import com.example.installer.entity.PackageEntity
+import com.example.installer.entity.ProductEntity
+import com.example.installer.entity.Result
 import com.example.installer.utils.ApiServiceUtil
 import com.example.installer.utils.RxsRxSchedulers
 import rx.Observable
@@ -14,12 +14,10 @@ import rx.Observable
  **/
 class MainRepository {
     companion object {
-        @JvmStatic
-        fun getApplicationList(): Observable<KtResult<List<PackageEntity>?>?> {
-            return ApiServiceUtil.getApplicationList().compose(RxsRxSchedulers.io_main())
+        fun getProductList(): Observable<Result<List<ProductEntity>>> {
+            return ApiServiceUtil.getProductList().compose(RxsRxSchedulers.io_main())
         }
 
-        @JvmStatic
         fun getPackageList(
             system_name: String?,
 
@@ -28,7 +26,7 @@ class MainRepository {
             version_type: String?,
 
             pageIndex: Int
-        ): Observable<KtResult<List<APKEntity>?>?> {
+        ): Observable<Result<List<PackageEntity>>> {
             return ApiServiceUtil.getPackageList(
                 system_name,
                 application_id,

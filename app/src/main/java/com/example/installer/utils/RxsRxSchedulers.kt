@@ -11,7 +11,6 @@ import rx.schedulers.Schedulers
  **/
 class RxsRxSchedulers {
     companion object {
-        @JvmStatic
         fun <T> io_main(): Observable.Transformer<T, T>? {
             return Observable.Transformer { tObservable ->
                 tObservable.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
