@@ -11,7 +11,6 @@ import androidx.recyclerview.widget.RecyclerView
 abstract class CustomRecyclerOnScrollListener : RecyclerView.OnScrollListener() {
     //用来标记是否正在向上滑动
     private var isSlidingUpward = false
-    private val TAG = "EndlessRecyclerOnScroll"
 
     companion object {
         var flag = true
@@ -35,7 +34,7 @@ abstract class CustomRecyclerOnScrollListener : RecyclerView.OnScrollListener() 
     }
 
     override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-        super.onScrolled(recyclerView!!, dx, dy)
+        super.onScrolled(recyclerView, dx, dy)
         // 大于0表示正在向上滑动，小于等于0表示停止或向下滑动
         isSlidingUpward = dy > 0
     }

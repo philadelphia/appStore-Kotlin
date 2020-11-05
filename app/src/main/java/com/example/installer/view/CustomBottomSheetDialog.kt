@@ -78,13 +78,13 @@ class CustomBottomSheetDialog : View {
     }
 
     fun show() {
-        if (!bottomSheetDialog?.isShowing) {
+        if (!bottomSheetDialog.isShowing) {
             bottomSheetDialog.show()
         }
     }
 
     fun dismiss() {
-        if (bottomSheetDialog?.isShowing) {
+        if (bottomSheetDialog.isShowing) {
             bottomSheetDialog.dismiss()
         }
     }

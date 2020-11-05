@@ -11,10 +11,13 @@ import rx.Subscriber
 
  **/
 abstract class ResultSubscriber<T> : Subscriber<Result<T>>() {
-    private val TAG = "ResultSubscriber"
+    companion object {
+        private const val TAG = "ResultSubscriber"
+    }
+
     override fun onError(e: Throwable) {
         when {
-            e is HttpException -> {
+            (e is HttpException) -> {
                 Log.i(TAG, "onError: http exception")
             }
             else -> {

@@ -15,7 +15,7 @@ import rx.Observable
 class MainRepository {
     companion object {
         fun getProductList(): Observable<Result<List<ProductEntity>>> {
-            return ApiServiceUtil.getProductList().compose(RxsRxSchedulers.io_main())
+            return ApiServiceUtil.getProductList().compose(RxsRxSchedulers.ioToMain())
         }
 
         fun getPackageList(
@@ -32,7 +32,7 @@ class MainRepository {
                 application_id,
                 version_type,
                 pageIndex
-            ).compose(RxsRxSchedulers.io_main())
+            ).compose(RxsRxSchedulers.ioToMain())
         }
     }
 }

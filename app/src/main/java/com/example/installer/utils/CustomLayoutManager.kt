@@ -11,14 +11,12 @@ import androidx.recyclerview.widget.RecyclerView
  **/
 class CustomLayoutManager : LinearLayoutManager {
 
-    constructor(context: Context) : super(context) {
-    }
+    constructor(context: Context) : super(context)
 
     constructor(
         context: Context, @RecyclerView.Orientation orientation: Int,
         reverseLayout: Boolean
-    ) : super(context, orientation, reverseLayout) {
-    }
+    ) : super(context, orientation, reverseLayout)
 
     override fun supportsPredictiveItemAnimations(): Boolean {
         return false

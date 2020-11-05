@@ -15,7 +15,7 @@ import java.io.File
 @date   2020/10/23
 
  **/
-class MyReceiver() : BroadcastReceiver() {
+class MyReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context?, intent: Intent?) {
         val fileName = intent!!.getStringExtra(KtDownloadService.FILE_NAME)
         installAPK(context, fileName)
@@ -34,7 +34,7 @@ class MyReceiver() : BroadcastReceiver() {
             intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             FileProvider.getUriForFile(
                 context!!,
-                BuildConfig.APPLICATION_ID + ".fileprovider",
+                BuildConfig.APPLICATION_ID + ".fileProvider",
                 file
             ) //通过FileProvider创建一个content类型的Uri
         } else {

@@ -10,14 +10,11 @@ import androidx.recyclerview.widget.RecyclerView
 @date   2020/11/3
 
  **/
-abstract class KtBottomSheetRecyclerAdapter<T> : RecyclerView.Adapter<CommonViewHolder> {
-    private var dataSource: List<T> = ArrayList()
+abstract class KtBottomSheetRecyclerAdapter<T>(dataSource: List<T>) :
+    RecyclerView.Adapter<CommonViewHolder>() {
+    private var dataSource: List<T> = dataSource
 
-    constructor(dataSource: List<T>) {
-        this.dataSource = dataSource
-    }
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CommonViewHolder {
+    override fun onCreateViewHolder(@NonNull parent: ViewGroup, viewType: Int): CommonViewHolder {
         val itemView = LayoutInflater.from(parent.context).inflate(getItemLayoutID(), parent, false)
         return CommonViewHolder(itemView)
     }
@@ -29,7 +26,6 @@ abstract class KtBottomSheetRecyclerAdapter<T> : RecyclerView.Adapter<CommonView
     override fun getItemCount(): Int {
         return if (dataSource == null) 0 else dataSource.size
     }
-
 
     abstract fun convert(holder: CommonViewHolder, item: T, position: Int)
 

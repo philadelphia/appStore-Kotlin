@@ -12,7 +12,7 @@ import com.example.installer.databinding.ActivityWelcomeBinding
 import com.example.installer.utils.DisplayUtil
 
 class WelcomeActivity : AppCompatActivity() {
-    lateinit var binding: ActivityWelcomeBinding
+    private lateinit var binding: ActivityWelcomeBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -24,9 +24,9 @@ class WelcomeActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         if (!isTaskRoot) {
-            var intent = Intent()
-            var action: String? = intent.action
-            if (intent.hasCategory(Intent.CATEGORY_LAUNCHER) && Intent.ACTION_MAIN.equals(action)) {
+            val intent = Intent()
+            val action: String? = intent.action
+            if (intent.hasCategory(Intent.CATEGORY_LAUNCHER) && Intent.ACTION_MAIN == action) {
                 finish()
                 return
             }
@@ -35,12 +35,12 @@ class WelcomeActivity : AppCompatActivity() {
         binding = ActivityWelcomeBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        var layoutParams: RelativeLayout.LayoutParams =
+        val layoutParams: RelativeLayout.LayoutParams =
             (binding.imgIcon.layoutParams) as RelativeLayout.LayoutParams
-        layoutParams.topMargin = (DisplayUtil.getWindowHight(this) * 0.3).toInt()
+        layoutParams.topMargin = (DisplayUtil.getWindowHeight(this) * 0.3).toInt()
         binding.imgIcon.layoutParams = layoutParams
 
-        Handler(Looper.getMainLooper()).postDelayed(Runnable {
+        Handler(Looper.getMainLooper()).postDelayed({
             val intent = Intent(this@WelcomeActivity, MainActivity::class.java)
             startActivity(intent)
             finish()

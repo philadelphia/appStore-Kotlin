@@ -9,9 +9,9 @@ class SingleClick {
     companion object{
         private var lastTime: Long = 0
 
-        fun isSingle(defalutTime: Long): Boolean {
+        fun isSingle(defaultTime: Long): Boolean {
             val currentTime = System.currentTimeMillis()
-            val isSign = if (currentTime - lastTime <= defalutTime) false else true
+            val isSign = currentTime - lastTime > defaultTime
             lastTime = currentTime
             return isSign
         }

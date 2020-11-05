@@ -38,7 +38,7 @@ class FilterTabItemView : RelativeLayout {
     }
 
     fun setTitle(title: String?) {
-        binding.tvFilterTitle.setText(title)
+        binding.tvFilterTitle.text = title
     }
 
     fun setHighLight(highLight: Boolean) {

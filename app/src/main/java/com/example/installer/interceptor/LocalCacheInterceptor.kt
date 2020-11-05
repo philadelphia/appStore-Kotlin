@@ -12,8 +12,10 @@ import okhttp3.Response
 @date   2020/11/3
 
  **/
-class LocalCacheInterceptor: Interceptor {
-    private val TAG = "LocalCacheInterceptor"
+class LocalCacheInterceptor : Interceptor {
+    companion object {
+        private const val TAG = "LocalCacheInterceptor"
+    }
 
     override fun intercept(chain: Interceptor.Chain): Response {
         var request = chain.request()

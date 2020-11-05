@@ -17,7 +17,7 @@ data class BuildType(val buildTypes: String?) : ISelectable {
     }
 
     override fun getName(): String? {
-        return buildType;
+        return buildType
     }
 
 }

@@ -80,7 +80,7 @@ class DisplayUtil {
          * 像素
          * @param context
          */
-        fun getWindowHight(context: Activity): Int {
+        fun getWindowHeight(context: Activity): Int {
             val metric = DisplayMetrics()
             context.windowManager.defaultDisplay.getMetrics(metric)
             return metric.heightPixels // 屏幕高度（像素）

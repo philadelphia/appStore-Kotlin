@@ -19,14 +19,14 @@ class StatusLayout : AutoRelativeLayout {
     constructor(context: Context, attributeSet: AttributeSet) : super(context, attributeSet)
 
     companion object {
-        val StateContent = -1
-        val StateLoading = 0
-        val StateError = 1
-        val StateEmpty = 2
-        val StateNoNet = 3
+        const val StateContent = -1
+        const val StateLoading = 0
+        const val StateError = 1
+        const val StateEmpty = 2
+        const val StateNoNet = 3
     }
 
-    private val noNetwrokView by lazy {
+    private val noNetworkView by lazy {
         LayoutInflater.from(context).inflate(R.layout.viewstatus_no_netwrok, this, false)
     }
 
@@ -71,7 +71,7 @@ class StatusLayout : AutoRelativeLayout {
             StatusLayout1.StateEmpty -> retuView = noDataView
             StatusLayout1.StateError -> retuView = loadingWrongView
             StatusLayout1.StateLoading -> retuView = loadingView
-            StatusLayout1.StateNoNet -> retuView = noNetwrokView
+            StatusLayout1.StateNoNet -> retuView = noNetworkView
         }
         return retuView
     }

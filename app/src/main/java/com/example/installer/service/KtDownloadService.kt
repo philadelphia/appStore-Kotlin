@@ -21,7 +21,7 @@ class KtDownloadService : JobIntentService() {
         const val DOWNLOAD_PATH = "download_path"
         const val BROADCAST_ACTION = "com.meiliwu.installer.service.BROADCAST"
         const val EXTENDED_DATA_STATUS = "com.meiliwu.installer.service.STATUS"
-        const val JOB_ID = 1
+        private const val JOB_ID = 1
 
         fun enqueueWork(context: Context, work: Intent) {
             enqueueWork(
@@ -32,13 +32,13 @@ class KtDownloadService : JobIntentService() {
     }
 
     override fun onHandleWork(intent: Intent) {
-        var dataString = intent.dataString
-        var fileName = intent.getStringExtra(FILE_NAME)
-        var downloadPath = intent.getStringExtra(DOWNLOAD_PATH)
+        val dataString = intent.dataString
+        val fileName = intent.getStringExtra(FILE_NAME)
+        val downloadPath = intent.getStringExtra(DOWNLOAD_PATH)
 
-        var downLoadService: DownloadManager =
+        val downLoadService: DownloadManager =
             getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
-        var request = DownloadManager.Request(Uri.parse(dataString))
+        val request = DownloadManager.Request(Uri.parse(dataString))
 
         //指定APK缓存路径和应用名称，可在SD卡/storage/sdcard0/Download文件夹中查看
         request.setDestinationInExternalPublicDir(downloadPath, fileName)
@@ -59,9 +59,9 @@ class KtDownloadService : JobIntentService() {
         val requestId: Long = downLoadService.enqueue(request)
 
         //将id放进Intent
-        val localIntent = Intent(KtDownloadService.BROADCAST_ACTION)
+        val localIntent = Intent(BROADCAST_ACTION)
         localIntent.putExtra(DownloadManager.EXTRA_DOWNLOAD_ID, requestId)
-        localIntent.putExtra(KtDownloadService.FILE_NAME, fileName)
+        localIntent.putExtra(FILE_NAME, fileName)
         //查询下载信息
         val query = DownloadManager.Query()
         query.setFilterById(requestId)
@@ -71,9 +71,8 @@ class KtDownloadService : JobIntentService() {
             while (isGoing) {
                 val cursor: Cursor = downLoadService.query(query)
 
-                if (cursor?.moveToFirst()) {
-                    val status = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS))
-                    when (status) {
+                if (cursor.moveToFirst()) {
+                    when (cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS))) {
                         DownloadManager.STATUS_SUCCESSFUL -> {
                             isGoing = false
                             //调用LocalBroadcastManager.sendBroadcast将intent传递回去
@@ -81,7 +80,7 @@ class KtDownloadService : JobIntentService() {
                         }
                     }
                 }
-                cursor?.close()
+                cursor.close()
             }
         } catch (e: Exception) {
             e.printStackTrace()
