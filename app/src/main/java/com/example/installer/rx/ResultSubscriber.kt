@@ -30,7 +30,7 @@ abstract class ResultSubscriber<T> : Subscriber<Result<T>>() {
 
     override fun onNext(result: Result<T>) {
         if (result.code == 0) {
-            onSuccess(result.data?.data as T)
+            onSuccess(result.data?.data)
         } else {
             onError(result.message)
         }
