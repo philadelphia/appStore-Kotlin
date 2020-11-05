@@ -5,7 +5,7 @@ package com.example.installer.constant
 @date   2020/11/2
 
  **/
-class ktConstant {
+class Constant {
     companion object {
         const val BASE_URL = "http://backstage.mlwplus.com/"
     }

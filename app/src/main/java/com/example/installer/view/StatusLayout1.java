@@ -22,7 +22,7 @@ public class StatusLayout1 extends AutoRelativeLayout {
     /**
      * 四种状态布局
      **/
-    private View noNetwrokView, loadingView, loadingWrongView, noDataView;
+    private View noNetworkView, loadingView, loadingWrongView, noDataView;
     /***
      *
      * 存放所有的布局文件
@@ -49,9 +49,9 @@ public class StatusLayout1 extends AutoRelativeLayout {
             LayoutParams params = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
             if (array.hasValue(R.styleable.StatusLayout_noNetLayout)) {
                 int noNetId = array.getResourceId(R.styleable.StatusLayout_noNetLayout, R.layout.viewstatus_no_netwrok);
-                noNetwrokView = inflater.inflate(noNetId, null);
-                addView(noNetwrokView, params);
-                setViewVisibility(noNetwrokView, false);
+                noNetworkView = inflater.inflate(noNetId, null);
+                addView(noNetworkView, params);
+                setViewVisibility(noNetworkView, false);
             }
             if (array.hasValue(R.styleable.StatusLayout_emptyLayout)) {
                 int emptyId = array.getResourceId(R.styleable.StatusLayout_emptyLayout, R.layout.viewstatus_no_data);
@@ -105,9 +105,9 @@ public class StatusLayout1 extends AutoRelativeLayout {
                 }
                 break;
             case StateNoNet:
-                if (noNetwrokView == null) {
-                    noNetwrokView = inflater.inflate(R.layout.viewstatus_no_netwrok, null);
-                    pView = noNetwrokView;
+                if (noNetworkView == null) {
+                    noNetworkView = inflater.inflate(R.layout.viewstatus_no_netwrok, null);
+                    pView = noNetworkView;
                 }
                 break;
         }
@@ -136,7 +136,7 @@ public class StatusLayout1 extends AutoRelativeLayout {
      */
     public void showNoNetView() {
         checkNullAndInflate(StateNoNet);
-        selectView(nowShowView(mShowState), noNetwrokView);
+        selectView(nowShowView(mShowState), noNetworkView);
         mShowState = StateNoNet;
     }
 
@@ -175,13 +175,13 @@ public class StatusLayout1 extends AutoRelativeLayout {
      */
     public void setNoNetClick(OnClickListener pClick) {
         if (SingleClick.Companion.isSingle(2000)) {
-            if (noNetwrokView == null) {
+            if (noNetworkView == null) {
                 throw new NullPointerException("view not inflate");
             }
             if (pClick != null) {
-                noNetwrokView.findViewById(R.id.vs_nn_root).setOnClickListener(pClick);
+                noNetworkView.findViewById(R.id.vs_nn_root).setOnClickListener(pClick);
             } else {
-                noNetwrokView.findViewById(R.id.vs_nn_root).setOnClickListener(new OnClickListener() {
+                noNetworkView.findViewById(R.id.vs_nn_root).setOnClickListener(new OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         openWifiSetting(getContext());
@@ -275,7 +275,7 @@ public class StatusLayout1 extends AutoRelativeLayout {
                 retuView = loadingView;
                 break;
             case StateNoNet:
-                retuView = noNetwrokView;
+                retuView = noNetworkView;
                 break;
         }
         return retuView;
@@ -355,22 +355,22 @@ public class StatusLayout1 extends AutoRelativeLayout {
      * @param view
      */
     private void checkIsContentView(View view) {
-        if (view != null && view != noNetwrokView && view != loadingView && view != loadingWrongView && view != noDataView) {
+        if (view != null && view != noNetworkView && view != loadingView && view != loadingWrongView && view != noDataView) {
             mContentView = view;
-            int mixConut = 0;
-            if (noNetwrokView != null) {
-                mixConut++;
+            int mixCount = 0;
+            if (noNetworkView != null) {
+                mixCount++;
             }
             if (loadingView != null) {
-                mixConut++;
+                mixCount++;
             }
             if (loadingWrongView != null) {
-                mixConut++;
+                mixCount++;
             }
             if (noDataView != null) {
-                mixConut++;
+                mixCount++;
             }
-            if (getChildCount() != mixConut) {
+            if (getChildCount() != mixCount) {
                 throw new RuntimeException("StatusLayout must only one child");
             }
 

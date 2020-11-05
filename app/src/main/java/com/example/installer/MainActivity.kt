@@ -42,17 +42,20 @@ import kotlin.collections.ArrayList
 
 class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
     CustomBottomSheetDialog.OnItemClickListener {
-    private lateinit var binding: ActivityMainBinding
-    private lateinit var mainViewModel: MainViewModel
-    private val defaultSystemType = "android"
     private var mBuildType: String? = null
     private var mApplicationID: String? = null
     private var pageIndex = 1
-    private val DEFAULT_PAGE_SIZE = 20
+
+    private val defaultSystemType = "android"
     private val mProductList: MutableList<ProductEntity> = ArrayList()
     private val mPackageList: MutableList<PackageEntity> = ArrayList()
     private val mBuildTypeList: MutableList<BuildType> = ArrayList()
-    private var adapter: CustomRecyclerAdapter<PackageEntity>? = null
+
+    private lateinit var binding: ActivityMainBinding
+    private lateinit var mainViewModel: MainViewModel
+
+
+    private lateinit var adapter: CustomRecyclerAdapter<PackageEntity>
 
     private val packageBottomSheetDialog: CustomBottomSheetDialog by lazy {
         CustomBottomSheetDialog(this)
@@ -62,10 +65,14 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
         CustomBottomSheetDialog(this)
     }
 
-    private lateinit var receiver: MyReceiver
 
+    private val receiver: MyReceiver by lazy {
+        MyReceiver()
+    }
+    private var isLoadCompleted = false
     companion object {
         val DOWNLOAD_PATH: String = Environment.DIRECTORY_DOWNLOADS + "/installer_app"
+        const val DEFAULT_PAGE_SIZE = 20
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -75,14 +82,13 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
         mainViewModel = MainViewModel()
         binding.swipeRefreshLayout.setOnRefreshListener(this)
         initData()
-        requestPermissions()
         initAdapter()
-
+        requestPermissions()
         binding.filterBuildType.setOnClickListener { showBuildTypeDialog(mBuildTypeList) }
 
-        binding.filterPackageName.setOnClickListener({
+        binding.filterPackageName.setOnClickListener {
             showApkNameDialog(mProductList)
-        })
+        }
 
         //请求数据
         binding.swipeRefreshLayout.isRefreshing = true
@@ -138,12 +144,13 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
     private fun doFilter(application_id: String?, version_type: String?) {
         binding.swipeRefreshLayout.isRefreshing = true
         pageIndex = 1
+        isLoadCompleted = false
         if (!NetWorkUtil.isNetConnected()) {
             binding.statusLayout.showNoNetView()
             return
         }
         mPackageList.clear()
-        adapter?.notifyDataSetChanged()
+        adapter.notifyDataSetChanged()
         this.mBuildType = version_type
         this.mApplicationID = application_id
         mainViewModel.getProductList(
@@ -163,8 +170,8 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
             binding.swipeRefreshLayout.isRefreshing = aBoolean
         })
 
-        mainViewModel.getErrorEvent().observe(this, Observer { errosMessage ->
-            onError(errosMessage)
+        mainViewModel.getErrorEvent().observe(this, Observer { errorMessage ->
+            onError(errorMessage)
         })
 
         mainViewModel.getPackageListLiveData()
@@ -173,8 +180,9 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
             })
 
         mainViewModel.getPackageListResult().observe(this, Observer { aBoolean ->
-            if (!aBoolean) {
+            if (!aBoolean && pageIndex == 1) {
                 onLoadApplicationListFailed()
+                showErrorView()
             }
         })
 
@@ -222,7 +230,6 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
 
     override fun onResume() {
         super.onResume()
-        receiver = MyReceiver()
         val intentFilter = IntentFilter(KtDownloadService.BROADCAST_ACTION)
         intentFilter.addCategory(Intent.CATEGORY_DEFAULT)
         LocalBroadcastManager.getInstance(this).registerReceiver(receiver, intentFilter)
@@ -264,7 +271,7 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
                     toast.setGravity(Gravity.CENTER, 0, 0)
                     toast.show()
                     val nameList: List<String>? = item.download_url?.split("/")
-                    downLoadAPK(item.download_url, nameList?.get(nameList?.size - 1))
+                    downLoadAPK(item.download_url, nameList?.get(nameList.size - 1))
                 }, R.id.btn_downLoad)
             }
 
@@ -284,8 +291,8 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
         binding.recyclerView.setOnTouchListener { v, event -> binding.swipeRefreshLayout.isRefreshing }
         binding.recyclerView.addOnScrollListener(object : CustomRecyclerOnScrollListener() {
             override fun onLoadMore() {
-                if (adapter?.getState() != CustomRecyclerAdapter.LOADING_END) {
-                    adapter?.setState(CustomRecyclerAdapter.LOADING)
+                if (adapter.getState() != CustomRecyclerAdapter.LOADING_END && !isLoadCompleted) {
+                    adapter.setState(CustomRecyclerAdapter.LOADING)
                     mainViewModel.getProductList(
                         defaultSystemType,
                         mApplicationID,
@@ -293,7 +300,6 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
                         pageIndex
                     )
                 }
-
             }
 
             override fun setFlag(flag: Boolean) {
@@ -318,11 +324,8 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
         packageEntity.application_name = "全部"
         mProductList.add(0, packageEntity)
         dataSource?.let {
-            mProductList.addAll(dataSource)
+            mProductList.addAll(it)
         }
-//        if (dataSource != null) {
-//            mProductList.addAll(dataSource)
-//        }
     }
 
     private fun onLoadApplicationListFailed() {
@@ -330,19 +333,18 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
     }
 
     private fun onLoadPackageListSuccess(dataSource: List<PackageEntity>?) {
-        showContentView()
         binding.swipeRefreshLayout.isRefreshing = false
         dataSource?.let {
-            if (dataSource?.size < DEFAULT_PAGE_SIZE) {
-                adapter?.setState(CustomRecyclerAdapter.LOADING_END)
-                CustomRecyclerOnScrollListener.flag = false
+            if (dataSource.size < DEFAULT_PAGE_SIZE) {
+                adapter.setState(CustomRecyclerAdapter.LOADING_END)
+                isLoadCompleted = true
             } else {
-                adapter?.setState(CustomRecyclerAdapter.LOADING_COMPLETE)
+                adapter.setState(CustomRecyclerAdapter.LOADING_COMPLETE)
                 pageIndex++
             }
 
             mPackageList.addAll(dataSource)
-            adapter?.notifyItemRangeInserted(mPackageList.size, dataSource.size)
+            adapter.notifyItemRangeInserted(mPackageList.size, dataSource.size)
         }
 
 
@@ -355,8 +357,8 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
     }
 
     private fun onLoadPackageListFailed() {
-        adapter!!.setState(CustomRecyclerAdapter.LOADING_COMPLETE)
-        if (mProductList?.size == 0) {
+        adapter.setState(CustomRecyclerAdapter.LOADING_COMPLETE)
+        if (mProductList.size == 0) {
             binding.statusLayout.showEmptyView()
         }
         binding.statusLayout.setEmptyClick {
@@ -369,7 +371,6 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
         }
     }
 
-
     private fun showContentView() {
         binding.statusLayout.showContentView()
     }
@@ -381,7 +382,6 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
         }
 
         binding.statusLayout.setErrorClick {
-            binding.statusLayout.showContentView()
             binding.swipeRefreshLayout.isRefreshing = true
             mainViewModel.getProductList(
                 defaultSystemType,
@@ -399,34 +399,13 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
         }
     }
 
-    private fun checkNetWork() {
-        if (!NetWorkUtil.isNetConnected()) {
-            val builder = AlertDialog.Builder(this)
-                .setTitle("alert")
-                .setMessage("当前网络不可用，请检查网络设置")
-                .setNegativeButton(
-                    "取消"
-                ) { dialogInterface, i -> dialogInterface.cancel() }
-                .setPositiveButton(
-                    "确定"
-                ) { dialogInterface, i ->
-                    val intent = Intent()
-                    intent.action = Settings.ACTION_SETTINGS
-                    startActivity(intent)
-                }
-            val alertDialog = builder.create()
-            alertDialog.show()
-            alertDialog.setCanceledOnTouchOutside(false)
-        }
-    }
-
     private fun onError(message: String?) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 
     override fun onRefresh() {
         mPackageList.clear()
-        adapter!!.notifyItemMoved(0, mPackageList.size)
+        adapter.notifyItemMoved(0, mPackageList.size)
         pageIndex = 1
         mainViewModel.getProductList(
             defaultSystemType,

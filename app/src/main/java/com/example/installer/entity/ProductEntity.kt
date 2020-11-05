@@ -8,7 +8,6 @@ package com.example.installer.entity
 class ProductEntity : ISelectable {
     private var id: String? = null
     var application_name: String? = null
-
     override fun getID(): String? {
         return id
     }

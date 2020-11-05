@@ -29,16 +29,9 @@ data class PackageEntity(val s: String) : ISelectable {
     var application_id: String? = null
     var application_name: String? = null
     val system_name: String? = null
-    val version_describe: Any? = null
     val download_url: String? = null
-    val plist_url: String? = null
     val version_type: String? = null
-    val if_deleted: String? = null
-    val status: String? = null
     val create_time: String? = null
-    val update_time: String? = null
-    val update_type: String? = null
-    val uid: String? = null
     val icon_url: String? = null
     override fun getID(): String? {
         return id

@@ -11,11 +11,6 @@ import androidx.recyclerview.widget.RecyclerView
 abstract class CustomRecyclerOnScrollListener : RecyclerView.OnScrollListener() {
     //用来标记是否正在向上滑动
     private var isSlidingUpward = false
-    private val TAG = "EndlessRecyclerOnScroll"
-
-    companion object {
-        var flag = true
-    }
 
     override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
         super.onScrollStateChanged(recyclerView, newState)
@@ -27,7 +22,7 @@ abstract class CustomRecyclerOnScrollListener : RecyclerView.OnScrollListener() 
             val itemCount = manager.itemCount
 
             // 判断是否滑动到了最后一个item，并且是向上滑动
-            if (lastItemPosition == itemCount - 1 && isSlidingUpward && flag) {
+            if (lastItemPosition == itemCount - 1 && isSlidingUpward ) {
                 //加载更多
                 onLoadMore()
             }
@@ -35,7 +30,7 @@ abstract class CustomRecyclerOnScrollListener : RecyclerView.OnScrollListener() 
     }
 
     override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-        super.onScrolled(recyclerView!!, dx, dy)
+        super.onScrolled(recyclerView, dx, dy)
         // 大于0表示正在向上滑动，小于等于0表示停止或向下滑动
         isSlidingUpward = dy > 0
     }
@@ -44,5 +39,4 @@ abstract class CustomRecyclerOnScrollListener : RecyclerView.OnScrollListener() 
      * 加载更多回调
      */
     abstract fun onLoadMore()
-    abstract fun setFlag(flag: Boolean)
 }

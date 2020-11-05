@@ -5,18 +5,18 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.installer.R
-import java.util.*
 
 /**
 @author zhangtao
 @date   2020/11/3
 
  **/
-abstract class CustomRecyclerAdapter<T> : RecyclerView.Adapter<CommonViewHolder> {
-    var dataSource: List<T> = ArrayList()
+abstract class CustomRecyclerAdapter<T>(dataSource: MutableList<T>) :
+    RecyclerView.Adapter<CommonViewHolder>() {
 
     // 当前加载状态，默认为加载完成
     private var loadState = 2
+    private val dataSource: MutableList<T>
 
     companion object {
         // 普通布局
@@ -35,8 +35,7 @@ abstract class CustomRecyclerAdapter<T> : RecyclerView.Adapter<CommonViewHolder>
         const val LOADING_END = 3
     }
 
-    constructor(dataSource: List<T>) {
-//        this.dataSource.addAll(dataSource)
+    init {
         this.dataSource = dataSource
     }
 
@@ -103,12 +102,12 @@ abstract class CustomRecyclerAdapter<T> : RecyclerView.Adapter<CommonViewHolder>
     }
 
     override fun getItemViewType(position: Int): Int {
-        when (position) {
+        return when (position) {
             (itemCount - 1) -> {
-                return TYPE_FOOTER
+                TYPE_FOOTER
             }
             else -> {
-                return TYPE_ITEM
+                TYPE_ITEM
             }
         }
     }

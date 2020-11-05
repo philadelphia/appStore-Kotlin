@@ -21,9 +21,9 @@ class NetWorkUtil {
             val cm =
                 App.instance.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
             if (cm != null) {
-                val infos = cm.allNetworkInfo
-                if (infos != null) {
-                    for (ni in infos) {
+                val infoList = cm.allNetworkInfo
+                if (infoList != null) {
+                    for (ni in infoList) {
                         if (ni.isConnected) {
                             return true
                         }

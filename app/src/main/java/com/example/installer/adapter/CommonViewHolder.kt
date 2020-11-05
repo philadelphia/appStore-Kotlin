@@ -15,10 +15,10 @@ import androidx.recyclerview.widget.RecyclerView.ViewHolder
  **/
 class CommonViewHolder(itemView: View) : ViewHolder(itemView) {
     private val mItemChildViews by lazy {
-        SparseArray<View>()
+        SparseArray<View?>()
     }
 
-    fun getView(@IdRes id: Int): View {
+    fun getView(@IdRes id: Int): View? {
         var childView = mItemChildViews.get(id)
         if (childView == null) {
             childView = itemView.findViewById(id)
@@ -29,14 +29,14 @@ class CommonViewHolder(itemView: View) : ViewHolder(itemView) {
 
     //TextView
     fun setText(viewId: Int, text: String?): CommonViewHolder? {
-        val textView: TextView = getView(viewId) as TextView
-        textView.text = text
+        val textView: TextView? = getView(viewId) as TextView
+        textView?.text = text
         return this
     }
 
     fun setTextColor(viewId: Int, @ColorInt color: Int): CommonViewHolder? {
-        val textView: TextView = getView(viewId) as TextView
-        textView.setTextColor(color)
+        val textView: TextView? = getView(viewId) as TextView
+        textView?.setTextColor(color)
         return this
     }
 
@@ -49,7 +49,7 @@ class CommonViewHolder(itemView: View) : ViewHolder(itemView) {
     ): CommonViewHolder? {
         for (id in viewIds) {
             val view = getView(id)
-            view.setOnClickListener(listener)
+            view?.setOnClickListener(listener)
         }
         return this
     }
@@ -59,7 +59,7 @@ class CommonViewHolder(itemView: View) : ViewHolder(itemView) {
     }
 
     fun setChecked(@IdRes id: Int, checked: Boolean) {
-        var view = getView(id)
+        val view = getView(id)
         if (view is Checkable)
             view.isChecked = checked
     }

@@ -44,7 +44,7 @@ class MainViewModel : ViewModel() {
                 override fun onError(message: String?) {
                     dialogEvent.value = false
                     errorEvent.value = message
-                    applicationListResult.value = false;
+                    applicationListResult.value = false
                 }
             })
         compositeSubscription.add(subscribe)
@@ -60,10 +60,10 @@ class MainViewModel : ViewModel() {
 
         pageIndex: Int
     ) {
-        var observable: Observable<Result<List<PackageEntity>>> =
+        val observable: Observable<Result<List<PackageEntity>>> =
             MainRepository.getPackageList(system_name, application_id, version_type, pageIndex)
 
-        var subscribe = observable.subscribe(object :
+        val subscribe = observable.subscribe(object :
             ResultSubscriber<List<PackageEntity>>() {
             override fun onSuccess(data: List<PackageEntity>?) {
                 dialogEvent.value = false
@@ -77,7 +77,7 @@ class MainViewModel : ViewModel() {
             }
         })
 
-        compositeSubscription.add(subscribe);
+        compositeSubscription.add(subscribe)
     }
 
     fun getPackageListLiveData(): MutableLiveData<List<PackageEntity>?> {
@@ -102,10 +102,6 @@ class MainViewModel : ViewModel() {
 
     fun getApplicationListResult(): MutableLiveData<Boolean> {
         return applicationListResult
-    }
-
-    override fun onCleared() {
-        super.onCleared()
     }
 
 }

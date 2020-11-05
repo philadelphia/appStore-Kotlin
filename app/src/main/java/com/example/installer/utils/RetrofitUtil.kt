@@ -1,7 +1,7 @@
 package com.example.installer.utils
 
 import android.os.Environment
-import com.example.installer.constant.ktConstant
+import com.example.installer.constant.Constant
 import com.example.installer.interceptor.CacheInterceptor
 import com.example.installer.interceptor.LocalCacheInterceptor
 import okhttp3.Cache
@@ -20,6 +20,9 @@ import java.util.concurrent.TimeUnit
  **/
 class RetrofitUtil private constructor() : Serializable {
     companion object {
+        /*缓存最大容量为10M*/
+        const val MAX_CACHE_SIZE = 10 * 1024 * 1024
+
         fun getInstance(): RetrofitUtil {
             return SingletonHolder.instance
         }
@@ -29,8 +32,6 @@ class RetrofitUtil private constructor() : Serializable {
         val instance: RetrofitUtil = RetrofitUtil()
     }
 
-    /*缓存最大容量为10M*/
-    val MAX_CACHE_SIZE = 10 * 1024 * 1024
 
     private fun getOkHttpClient(): OkHttpClient? {
         return OkHttpClient.Builder()
@@ -51,7 +52,7 @@ class RetrofitUtil private constructor() : Serializable {
 
     fun <S> createService(service: Class<S>?): S {
         val retrofit = Retrofit.Builder()
-            .baseUrl(ktConstant.BASE_URL)
+            .baseUrl(Constant.BASE_URL)
             .client(getOkHttpClient())
             .addConverterFactory(GsonConverterFactory.create())
             .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
