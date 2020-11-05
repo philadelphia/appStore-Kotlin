@@ -52,9 +52,9 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
     private val mBuildTypeList: MutableList<BuildType> = ArrayList()
 
     private lateinit var binding: ActivityMainBinding
-    private lateinit var mainViewModel: MainViewModel
-
-
+    private val mainViewModel: MainViewModel by lazy {
+        MainViewModel()
+    }
     private lateinit var adapter: CustomRecyclerAdapter<PackageEntity>
 
     private val packageBottomSheetDialog: CustomBottomSheetDialog by lazy {
@@ -70,6 +70,7 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
         MyReceiver()
     }
     private var isLoadCompleted = false
+
     companion object {
         val DOWNLOAD_PATH: String = Environment.DIRECTORY_DOWNLOADS + "/installer_app"
         const val DEFAULT_PAGE_SIZE = 20
@@ -79,16 +80,13 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        mainViewModel = MainViewModel()
         binding.swipeRefreshLayout.setOnRefreshListener(this)
         initData()
         initAdapter()
         requestPermissions()
-        binding.filterBuildType.setOnClickListener { showBuildTypeDialog(mBuildTypeList) }
 
-        binding.filterPackageName.setOnClickListener {
-            showApkNameDialog(mProductList)
-        }
+        binding.filterBuildType.setOnClickListener { showBuildTypeDialog(mBuildTypeList) }
+        binding.filterPackageName.setOnClickListener { showApkNameDialog(mProductList) }
 
         //请求数据
         binding.swipeRefreshLayout.isRefreshing = true
@@ -300,10 +298,6 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
                         pageIndex
                     )
                 }
-            }
-
-            override fun setFlag(flag: Boolean) {
-
             }
         })
 

@@ -35,7 +35,6 @@ class KtDownloadService : JobIntentService() {
         val dataString = intent.dataString
         val fileName = intent.getStringExtra(FILE_NAME)
         val downloadPath = intent.getStringExtra(DOWNLOAD_PATH)
-
         val downLoadService: DownloadManager =
             getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
         val request = DownloadManager.Request(Uri.parse(dataString))
