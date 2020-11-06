@@ -1,4 +1,4 @@
-package com.example.installer
+package com.example.installer.ui
 
 import android.Manifest
 import android.app.Activity
@@ -22,6 +22,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.bumptech.glide.Glide
+import com.example.installer.R
 import com.example.installer.adapter.CommonViewHolder
 import com.example.installer.adapter.CustomRecyclerAdapter
 import com.example.installer.databinding.ActivityMainBinding
@@ -30,6 +31,7 @@ import com.example.installer.entity.ISelectable
 import com.example.installer.entity.PackageEntity
 import com.example.installer.entity.ProductEntity
 import com.example.installer.mvvm.MainViewModel
+import com.example.installer.receiver.MyReceiver
 import com.example.installer.service.DownloadService
 import com.example.installer.utils.CustomRecyclerOnScrollListener
 import com.example.installer.utils.NetWorkUtil

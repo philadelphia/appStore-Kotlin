@@ -1,4 +1,4 @@
-package com.example.installer
+package com.example.installer.ui
 
 import android.content.Intent
 import android.os.Build

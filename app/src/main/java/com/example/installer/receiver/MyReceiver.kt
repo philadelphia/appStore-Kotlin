@@ -1,4 +1,4 @@
-package com.example.installer
+package com.example.installer.receiver
 
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -6,6 +6,8 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import androidx.core.content.FileProvider
+import com.example.installer.BuildConfig
+import com.example.installer.ui.MainActivity
 import com.example.installer.service.DownloadService
 import java.io.File
 
