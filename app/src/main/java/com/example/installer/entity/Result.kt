@@ -9,11 +9,8 @@ class Result<T> {
     var code = 0
     var message: String? = null
     var data: ResultBean<T>? = null
-    var data1: ResultBean<T>? = null
 
-
-
-     class ResultBean<T> {
+    class ResultBean<T> {
         var data: T? = null
     }
 }

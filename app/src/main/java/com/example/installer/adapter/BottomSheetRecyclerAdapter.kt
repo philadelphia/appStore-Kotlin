@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 @date   2020/11/3
 
  **/
-abstract class KtBottomSheetRecyclerAdapter<T>(dataSource: List<T>) :
+abstract class BottomSheetRecyclerAdapter<T>(dataSource: List<T>) :
     RecyclerView.Adapter<CommonViewHolder>() {
     private var dataSource: List<T> = dataSource
 

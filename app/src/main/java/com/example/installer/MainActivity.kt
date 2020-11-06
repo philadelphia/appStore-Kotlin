@@ -30,7 +30,7 @@ import com.example.installer.entity.ISelectable
 import com.example.installer.entity.PackageEntity
 import com.example.installer.entity.ProductEntity
 import com.example.installer.mvvm.MainViewModel
-import com.example.installer.service.KtDownloadService
+import com.example.installer.service.DownloadService
 import com.example.installer.utils.CustomRecyclerOnScrollListener
 import com.example.installer.utils.NetWorkUtil
 import com.example.installer.view.CustomBottomSheetDialog
@@ -228,7 +228,7 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
 
     override fun onResume() {
         super.onResume()
-        val intentFilter = IntentFilter(KtDownloadService.BROADCAST_ACTION)
+        val intentFilter = IntentFilter(DownloadService.BROADCAST_ACTION)
         intentFilter.addCategory(Intent.CATEGORY_DEFAULT)
         LocalBroadcastManager.getInstance(this).registerReceiver(receiver, intentFilter)
 
@@ -304,11 +304,11 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
     }
 
     private fun downLoadAPK(url: String?, fileName: String?) {
-        val serviceIntent = Intent(this, KtDownloadService.javaClass)
+        val serviceIntent = Intent(this, DownloadService.javaClass)
         serviceIntent.data = Uri.parse(url)
-        serviceIntent.putExtra(KtDownloadService.FILE_NAME, fileName)
-        serviceIntent.putExtra(KtDownloadService.DOWNLOAD_PATH, DOWNLOAD_PATH)
-        KtDownloadService.enqueueWork(this, serviceIntent)
+        serviceIntent.putExtra(DownloadService.FILE_NAME, fileName)
+        serviceIntent.putExtra(DownloadService.DOWNLOAD_PATH, DOWNLOAD_PATH)
+        DownloadService.enqueueWork(this, serviceIntent)
     }
 
     private fun onLoadProductListSuccess(dataSource: List<ProductEntity>?) {

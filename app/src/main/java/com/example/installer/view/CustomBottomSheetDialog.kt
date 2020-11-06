@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.example.installer.R
 import com.example.installer.adapter.CommonViewHolder
 import com.example.installer.adapter.CustomItemDecoration
-import com.example.installer.adapter.KtBottomSheetRecyclerAdapter
+import com.example.installer.adapter.BottomSheetRecyclerAdapter
 import com.example.installer.adapter.OnRecyclerViewItemClickListener
 import com.example.installer.databinding.LayoutBottomSheetDialogBinding
 import com.example.installer.entity.ISelectable
@@ -32,8 +32,8 @@ class CustomBottomSheetDialog : View {
         BottomSheetDialog(context)
     }
 
-    private val mAdapter: KtBottomSheetRecyclerAdapter<ISelectable> by lazy {
-        object : KtBottomSheetRecyclerAdapter<ISelectable>(dataSource) {
+    private val mAdapter: BottomSheetRecyclerAdapter<ISelectable> by lazy {
+        object : BottomSheetRecyclerAdapter<ISelectable>(dataSource) {
 
             override fun convert(holder: CommonViewHolder, item: ISelectable, position: Int) {
                 holder.setChecked(R.id.tv_packageName, item.getName() == selectItemName)

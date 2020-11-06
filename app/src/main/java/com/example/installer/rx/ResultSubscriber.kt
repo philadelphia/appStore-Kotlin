@@ -23,7 +23,6 @@ abstract class ResultSubscriber<T> : Subscriber<Result<T>>() {
             else -> {
                 Log.i(TAG, "onError: 其他 错误")
             }
-
         }
         onError(e.message)
     }
@@ -38,6 +37,6 @@ abstract class ResultSubscriber<T> : Subscriber<Result<T>>() {
 
     override fun onCompleted() {}
 
-    abstract fun onSuccess(t: T?)
+    abstract fun onSuccess(data: T?)
     abstract fun onError(message: String?)
 }

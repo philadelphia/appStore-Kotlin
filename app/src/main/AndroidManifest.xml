@@ -37,7 +37,7 @@
             android:screenOrientation="portrait" />
 
         <service
-            android:name=".service.KtDownloadService"
+            android:name=".service.DownloadService"
             android:exported="false"
             android:permission="android.permission.BIND_JOB_SERVICE" />
 

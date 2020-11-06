@@ -13,7 +13,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 @date   2020/11/2
 
  **/
-class KtDownloadService : JobIntentService() {
+class DownloadService : JobIntentService() {
 
 
     companion object {
@@ -26,7 +26,7 @@ class KtDownloadService : JobIntentService() {
         fun enqueueWork(context: Context, work: Intent) {
             enqueueWork(
                 context,
-                KtDownloadService::class.java, JOB_ID, work
+                DownloadService::class.java, JOB_ID, work
             )
         }
     }
