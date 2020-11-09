@@ -18,24 +18,24 @@ class CommonViewHolder(itemView: View) : ViewHolder(itemView) {
         SparseArray<View?>()
     }
 
-    fun getView(@IdRes id: Int): View? {
+    fun <T : View> getView(@IdRes id: Int): T? {
         var childView = mItemChildViews.get(id)
         if (childView == null) {
             childView = itemView.findViewById(id)
             mItemChildViews.put(id, childView)
         }
-        return childView
+        return childView  as T
     }
 
     //TextView
     fun setText(viewId: Int, text: String?): CommonViewHolder? {
-        val textView: TextView? = getView(viewId) as TextView
+        val textView: TextView? = getView(viewId)
         textView?.text = text
         return this
     }
 
     fun setTextColor(viewId: Int, @ColorInt color: Int): CommonViewHolder? {
-        val textView: TextView? = getView(viewId) as TextView
+        val textView: TextView? = getView(viewId)
         textView?.setTextColor(color)
         return this
     }
@@ -48,18 +48,18 @@ class CommonViewHolder(itemView: View) : ViewHolder(itemView) {
         @IdRes vararg viewIds: Int
     ): CommonViewHolder? {
         for (id in viewIds) {
-            val view = getView(id)
+            val view =getView<View>(id)
             view?.setOnClickListener(listener)
         }
         return this
     }
 
     fun setVisible(@IdRes id: Int, visibility: Int) {
-        getView(id)?.visibility = visibility
+        getView<View>(id)?.visibility = visibility
     }
 
     fun setChecked(@IdRes id: Int, checked: Boolean) {
-        val view = getView(id)
+        val view = getView<View>(id)
         if (view is Checkable)
             view.isChecked = checked
     }

@@ -1,5 +1,8 @@
 package com.example.installer.entity
 
+import java.text.SimpleDateFormat
+import java.util.*
+
 /**
 @author zhangtao
 @date   2020/10/23
@@ -28,10 +31,20 @@ data class PackageEntity(val s: String) : ISelectable {
     var version_name: String? = null
     var application_id: String? = null
     var application_name: String? = null
+        get() {
+            return field + "(" + version_name + ")"
+        }
     val system_name: String? = null
     val download_url: String? = null
     val version_type: String? = null
-    val create_time: String? = null
+    var create_time: String? = null
+        get() {
+            val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd hh:mm:ss", Locale.getDefault())
+            field?.let { return simpleDateFormat.format(field?.toLong()?.times(1000)) }
+            return null
+        }
+
+
     val icon_url: String? = null
     override fun getID(): String? {
         return id

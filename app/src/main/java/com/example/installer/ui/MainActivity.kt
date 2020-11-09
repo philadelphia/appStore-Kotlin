@@ -10,10 +10,9 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
 import android.provider.Settings
-import android.text.TextUtils
+import android.util.Log
 import android.view.Gravity
 import android.view.View
-import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -37,9 +36,6 @@ import com.example.installer.utils.CustomRecyclerOnScrollListener
 import com.example.installer.utils.NetWorkUtil
 import com.example.installer.view.CustomBottomSheetDialog
 import com.tbruyelle.rxpermissions.RxPermissions
-import java.text.SimpleDateFormat
-import java.util.*
-import kotlin.collections.ArrayList
 
 
 class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
@@ -241,20 +237,16 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
             override fun convert(holder: CommonViewHolder, item: PackageEntity, position: Int) {
                 Glide.with(holder.itemView.context)
                     .load(item.icon_url)
-                    .into(holder.getView(R.id.img_icon) as ImageView)
+                    .into(holder.getView(R.id.img_icon)!!)
 
                 holder.setText(
                     R.id.tv_packageName,
-                    item.application_name.toString() + "(" + item.version_name + ")"
+                    item.application_name
                 )
 
-                val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd hh:mm:ss", Locale.getDefault())
-                val crateTime =
-                    simpleDateFormat.format(java.lang.Long.valueOf(item.create_time) * 1000)
+                holder.setText(R.id.tv_timeStamp, item.create_time)
 
-                holder.setText(R.id.tv_timeStamp, crateTime)
-
-                if (!TextUtils.isEmpty(item.version_type) && item.version_type.equals("测试")) {
+                if ("测试" == item.version_type) {
                     holder.setVisible(R.id.tv_isDebugVersion, View.VISIBLE)
                     holder.setText(R.id.tv_isDebugVersion, item.version_type)
                 } else {
