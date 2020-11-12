@@ -10,9 +10,8 @@ import androidx.recyclerview.widget.RecyclerView
 @date   2020/11/3
 
  **/
-abstract class BottomSheetRecyclerAdapter<T>(dataSource: List<T>) :
+abstract class BottomSheetRecyclerAdapter<T>(private val dataSource: List<T>) :
     RecyclerView.Adapter<CommonViewHolder>() {
-    private var dataSource: List<T> = dataSource
 
     override fun onCreateViewHolder(@NonNull parent: ViewGroup, viewType: Int): CommonViewHolder {
         val itemView = LayoutInflater.from(parent.context).inflate(getItemLayoutID(), parent, false)
@@ -24,7 +23,7 @@ abstract class BottomSheetRecyclerAdapter<T>(dataSource: List<T>) :
     }
 
     override fun getItemCount(): Int {
-        return if (dataSource == null) 0 else dataSource.size
+        return dataSource.size
     }
 
     abstract fun convert(holder: CommonViewHolder, item: T, position: Int)
