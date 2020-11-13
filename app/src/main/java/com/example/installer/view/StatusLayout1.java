@@ -181,12 +181,7 @@ public class StatusLayout1 extends AutoRelativeLayout {
             if (pClick != null) {
                 noNetworkView.findViewById(R.id.vs_nn_root).setOnClickListener(pClick);
             } else {
-                noNetworkView.findViewById(R.id.vs_nn_root).setOnClickListener(new OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        openWifiSetting(getContext());
-                    }
-                });
+                noNetworkView.findViewById(R.id.vs_nn_root).setOnClickListener(view -> openWifiSetting(getContext()));
             }
         }
 

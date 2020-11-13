@@ -44,9 +44,9 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
     private var pageIndex = 1
 
     private val defaultSystemType = "android"
-    private val mProductList: MutableList<ProductEntity> = ArrayList()
-    private val mPackageList: MutableList<PackageEntity> = ArrayList()
-    private val mBuildTypeList: MutableList<BuildType> = ArrayList()
+    private val mProductList = mutableListOf<ProductEntity>()
+    private val mPackageList = mutableListOf<PackageEntity>()
+    private val mBuildTypeList = mutableListOf<BuildType>()
 
     private lateinit var binding: ActivityMainBinding
     private val mainViewModel: MainViewModel by lazy {

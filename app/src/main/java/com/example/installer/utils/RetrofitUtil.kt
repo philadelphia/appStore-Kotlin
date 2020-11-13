@@ -1,7 +1,7 @@
 package com.example.installer.utils
 
 import android.os.Environment
-import com.example.installer.constant.Constant
+import com.example.installer.constant.BASE_URL
 import com.example.installer.interceptor.CacheInterceptor
 import com.example.installer.interceptor.LocalCacheInterceptor
 import okhttp3.Cache
@@ -52,7 +52,7 @@ class RetrofitUtil private constructor() : Serializable {
 
     fun <S> createService(service: Class<S>?): S {
         val retrofit = Retrofit.Builder()
-            .baseUrl(Constant.BASE_URL)
+            .baseUrl(BASE_URL)
             .client(getOkHttpClient())
             .addConverterFactory(GsonConverterFactory.create())
             .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
