@@ -3,6 +3,7 @@ package com.example.installer.adapter
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.NonNull
 import androidx.recyclerview.widget.RecyclerView
 import com.example.installer.R
 
@@ -62,7 +63,7 @@ abstract class CustomRecyclerAdapter<T>(dataSource: MutableList<T>) :
         }
     }
 
-    override fun onBindViewHolder(holder: CommonViewHolder, position: Int) {
+    override fun onBindViewHolder(@NonNull holder: CommonViewHolder, position: Int) {
         when (getItemViewType(position)) {
             TYPE_ITEM -> {
                 convert(holder, dataSource[position], position)
@@ -120,7 +121,7 @@ abstract class CustomRecyclerAdapter<T>(dataSource: MutableList<T>) :
         return loadState
     }
 
-    abstract fun convert(holder: CommonViewHolder, item: T, position: Int)
+    abstract fun convert(@NonNull holder: CommonViewHolder, item: T, position: Int)
 
     abstract fun getItemLayoutID(): Int
 

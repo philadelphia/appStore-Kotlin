@@ -24,7 +24,7 @@ class CommonViewHolder(itemView: View) : ViewHolder(itemView) {
             childView = itemView.findViewById(id)
             mItemChildViews.put(id, childView)
         }
-        return childView  as T
+        return childView as T
     }
 
     //TextView
@@ -44,11 +44,11 @@ class CommonViewHolder(itemView: View) : ViewHolder(itemView) {
      * set view onClickListeners
      */
     fun setOnClickListener(
-        listener: View.OnClickListener?,
-        @IdRes vararg viewIds: Int
+        @IdRes vararg viewIds: Int,
+        listener: (View) -> Unit
     ): CommonViewHolder? {
         for (id in viewIds) {
-            val view =getView<View>(id)
+            val view = getView<View>(id)
             view?.setOnClickListener(listener)
         }
         return this

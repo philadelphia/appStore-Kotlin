@@ -1,11 +1,13 @@
 package com.example.installer.utils
 
 import android.os.Environment
+import androidx.lifecycle.Lifecycle
 import com.example.installer.constant.BASE_URL
 import com.example.installer.interceptor.CacheInterceptor
 import com.example.installer.interceptor.LocalCacheInterceptor
 import okhttp3.Cache
 import okhttp3.OkHttpClient
+import okhttp3.Request
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory

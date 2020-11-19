@@ -12,6 +12,7 @@ import android.os.Environment
 import android.provider.Settings
 import android.view.Gravity
 import android.view.View
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -234,36 +235,35 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
     private fun initAdapter() {
         adapter = object : CustomRecyclerAdapter<PackageEntity>(mPackageList) {
             override fun convert(holder: CommonViewHolder, item: PackageEntity, position: Int) {
-                Glide.with(holder.itemView.context)
-                    .load(item.icon_url)
-                    .into(holder.getView(R.id.img_icon)!!)
+                with(item) {
+                    holder.getView<ImageView>(R.id.img_icon)?.let {
+                        Glide.with(holder.itemView.context)
+                            .load(icon_url)
+                            .into(it)
+                    }
 
-                holder.setText(
-                    R.id.tv_packageName,
-                    item.application_name
-                )
+                    holder.setText(R.id.tv_packageName, application_name)
+                    holder.setText(R.id.tv_timeStamp, create_time)
 
-                holder.setText(R.id.tv_timeStamp, item.create_time)
+                    if ("测试" == version_type) {
+                        holder.setVisible(R.id.tv_isDebugVersion, View.VISIBLE)
+                        holder.setText(R.id.tv_isDebugVersion, version_type)
+                    } else {
+                        holder.setVisible(R.id.tv_isDebugVersion, View.INVISIBLE)
+                    }
 
-                if ("测试" == item.version_type) {
-                    holder.setVisible(R.id.tv_isDebugVersion, View.VISIBLE)
-                    holder.setText(R.id.tv_isDebugVersion, item.version_type)
-                } else {
-                    holder.setVisible(R.id.tv_isDebugVersion, View.INVISIBLE)
+                    holder.setOnClickListener(R.id.btn_downLoad) {
+                        val toast: Toast = Toast.makeText(
+                            this@MainActivity,
+                            application_name + version_name + version_type + "正在下载，请稍后.....",
+                            Toast.LENGTH_LONG
+                        )
+                        toast.setGravity(Gravity.CENTER, 0, 0)
+                        toast.show()
+                        val nameList: List<String>? = download_url?.split("/")
+                        downLoadAPK(download_url, nameList?.get(nameList.size - 1))
+                    }
                 }
-
-                holder.setOnClickListener(View.OnClickListener {
-                    val toast: Toast = Toast.makeText(
-                        this@MainActivity,
-                        item.application_name + item.version_name + item.version_type
-                            .toString() + "正在下载，请稍后.....",
-                        Toast.LENGTH_LONG
-                    )
-                    toast.setGravity(Gravity.CENTER, 0, 0)
-                    toast.show()
-                    val nameList: List<String>? = item.download_url?.split("/")
-                    downLoadAPK(item.download_url, nameList?.get(nameList.size - 1))
-                }, R.id.btn_downLoad)
             }
 
             override fun getItemLayoutID(): Int {
@@ -280,19 +280,20 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
             LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         binding.recyclerView.adapter = adapter
         binding.recyclerView.setOnTouchListener { v, event -> binding.swipeRefreshLayout.isRefreshing }
-        binding.recyclerView.addOnScrollListener(object : CustomRecyclerOnScrollListener() {
-            override fun onLoadMore() {
-                if (adapter.getState() != CustomRecyclerAdapter.LOADING_END && !isLoadCompleted) {
-                    adapter.setState(CustomRecyclerAdapter.LOADING)
-                    mainViewModel.getProductList(
-                        defaultSystemType,
-                        mApplicationID,
-                        mBuildType,
-                        pageIndex
-                    )
+        binding.recyclerView.addOnScrollListener(
+            object : CustomRecyclerOnScrollListener() {
+                override fun onLoadMore() {
+                    if (adapter.getState() != CustomRecyclerAdapter.LOADING_END && !isLoadCompleted) {
+                        adapter.setState(CustomRecyclerAdapter.LOADING)
+                        mainViewModel.getProductList(
+                            defaultSystemType,
+                            mApplicationID,
+                            mBuildType,
+                            pageIndex
+                        )
+                    }
                 }
-            }
-        })
+            })
 
     }
 

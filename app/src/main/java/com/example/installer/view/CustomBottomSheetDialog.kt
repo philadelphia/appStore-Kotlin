@@ -55,7 +55,7 @@ class CustomBottomSheetDialog : View {
     constructor(context: Context, attrs: AttributeSet) : super(context, attrs)
 
 
-    interface OnItemClickListener {
+    fun interface OnItemClickListener {
         fun ontItemClick(view: View?, packageEntity: ISelectable?, position: Int)
     }
 
@@ -69,7 +69,7 @@ class CustomBottomSheetDialog : View {
                 override fun onItemClick(view: View?, position: Int) {
                     val entity = dataSource[position]
                     selectItemName = entity.getName()
-                    onItemClickListener!!.ontItemClick(view, entity, position)
+                    onItemClickListener?.ontItemClick(view, entity, position)
                 }
 
                 override fun onItemLongClick(view: View?, position: Int) {}
