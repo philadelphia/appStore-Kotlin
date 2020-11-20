@@ -20,7 +20,7 @@ class DownloadService : JobIntentService() {
         const val FILE_NAME = "fileName"
         const val DOWNLOAD_PATH = "download_path"
         const val BROADCAST_ACTION = "com.meiliwu.installer.service.BROADCAST"
-        const val EXTENDED_DATA_STATUS = "com.meiliwu.installer.service.STATUS"
+//        const val EXTENDED_DATA_STATUS = "com.meiliwu.installer.service.STATUS"
         private const val JOB_ID = 1
 
         fun enqueueWork(context: Context, work: Intent) {

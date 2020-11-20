@@ -13,11 +13,10 @@ import androidx.recyclerview.widget.RecyclerView.OnItemTouchListener
 
  **/
 abstract class OnRecyclerViewItemClickListener(recyclerView: RecyclerView) : OnItemTouchListener {
-    private var gestureDetectorCompat: GestureDetectorCompat? = null
-    private var recyclerView: RecyclerView
+    private var gestureDetectorCompat: GestureDetectorCompat
+    private var recyclerView: RecyclerView = recyclerView
 
     init {
-        this.recyclerView = recyclerView
         gestureDetectorCompat = GestureDetectorCompat(
             recyclerView.context,
             ItemTouchHelperGestureListener()
@@ -25,12 +24,12 @@ abstract class OnRecyclerViewItemClickListener(recyclerView: RecyclerView) : OnI
     }
 
     override fun onInterceptTouchEvent(rv: RecyclerView, e: MotionEvent): Boolean {
-        gestureDetectorCompat!!.onTouchEvent(e)
+        gestureDetectorCompat.onTouchEvent(e)
         return false
     }
 
     override fun onTouchEvent(rv: RecyclerView, e: MotionEvent) {
-        gestureDetectorCompat!!.onTouchEvent(e)
+        gestureDetectorCompat.onTouchEvent(e)
     }
 
 

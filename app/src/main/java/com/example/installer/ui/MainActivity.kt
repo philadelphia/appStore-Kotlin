@@ -16,7 +16,7 @@ import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -51,7 +51,7 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
 
     private lateinit var binding: ActivityMainBinding
     private val mainViewModel: MainViewModel by lazy {
-        MainViewModel()
+        ViewModelProvider(MainActivity@this).get(MainViewModel::class.java)
     }
     private lateinit var adapter: CustomRecyclerAdapter<PackageEntity>
 
@@ -162,36 +162,34 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
         mBuildTypeList.add(BuildType("正式"))
         mBuildTypeList.add(BuildType("测试"))
 
-        mainViewModel.getDialogEvent().observe(this, Observer { aBoolean ->
-            binding.swipeRefreshLayout.isRefreshing = aBoolean
-        })
+        mainViewModel.getDialogEvent().observe(this) {
+            binding.swipeRefreshLayout.isRefreshing = it
+        }
 
-        mainViewModel.getErrorEvent().observe(this, Observer { errorMessage ->
-            onError(errorMessage)
-        })
+        mainViewModel.getErrorEvent().observe(this) {
+            onError(it)
+        }
 
-        mainViewModel.getPackageListLiveData()
-            .observe(this@MainActivity, Observer { packageList ->
-                onLoadPackageListSuccess(packageList)
-            })
+        mainViewModel.getPackageListLiveData().observe(this) {
+            onLoadPackageListSuccess(it)
+        }
 
-        mainViewModel.getPackageListResult().observe(this, Observer { aBoolean ->
-            if (!aBoolean && pageIndex == 1) {
+        mainViewModel.getPackageListResult().observe(this) {
+            if (!it && pageIndex == 1) {
                 onLoadApplicationListFailed()
                 showErrorView()
             }
-        })
+        }
 
-        mainViewModel.getProductListLiveData().observe(this, Observer { packageList ->
-            onLoadProductListSuccess(packageList)
-        })
+        mainViewModel.getProductListLiveData().observe(this) {
+            onLoadProductListSuccess(it)
+        }
 
-        mainViewModel.getApplicationListResult().observe(
-            this, Observer { aBoolean ->
-                if (!aBoolean) {
-                    onLoadPackageListFailed()
-                }
-            })
+        mainViewModel.getApplicationListResult().observe(this) {
+            if (!it) {
+                onLoadPackageListFailed()
+            }
+        }
 
     }
 
@@ -213,7 +211,7 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
                         .setMessage("请务必给予存储权限，以便您的使用")
                         .setPositiveButton(
                             "确定"
-                        ) { dialog, which -> requestPermissions() }
+                        ) { _, _ -> requestPermissions() }
                     builder.create().show()
                 }
             }
@@ -273,13 +271,12 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
             override fun getFootViewLayoutID(): Int {
                 return R.layout.layout_footer_view
             }
-
         }
 
         binding.recyclerView.layoutManager =
             LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         binding.recyclerView.adapter = adapter
-        binding.recyclerView.setOnTouchListener { v, event -> binding.swipeRefreshLayout.isRefreshing }
+//        binding.recyclerView.setOnTouchListener { _, _ -> binding.swipeRefreshLayout.isRefreshing }
         binding.recyclerView.addOnScrollListener(
             object : CustomRecyclerOnScrollListener() {
                 override fun onLoadMore() {
@@ -294,11 +291,10 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
                     }
                 }
             })
-
     }
 
     private fun downLoadAPK(url: String?, fileName: String?) {
-        val serviceIntent = Intent(this, DownloadService.javaClass)
+        val serviceIntent = Intent(this, DownloadService::class.java)
         serviceIntent.data = Uri.parse(url)
         serviceIntent.putExtra(DownloadService.FILE_NAME, fileName)
         serviceIntent.putExtra(DownloadService.DOWNLOAD_PATH, DOWNLOAD_PATH)

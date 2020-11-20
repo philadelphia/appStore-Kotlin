@@ -56,7 +56,7 @@ class CustomBottomSheetDialog : View {
 
 
     fun interface OnItemClickListener {
-        fun ontItemClick(view: View?, packageEntity: ISelectable?, position: Int)
+        fun ontItemClick(view: View?, entity: ISelectable?, position: Int)
     }
 
     private fun initAdapter() {
