@@ -8,7 +8,7 @@ import java.util.*
 @date   2020/10/23
 
  **/
-data class PackageEntity(val s: String) : ISelectable {
+data class PackageEntity(var id: String?) : ISelectable {
     /**
      * id : 464
      * version_name : 4.9.3
@@ -27,16 +27,15 @@ data class PackageEntity(val s: String) : ISelectable {
      * uid : 50200d0ba8207c4b80a17744
      * icon_url : http://cdn.mse.mlwplus.com/meiliwu/applications/2018/03/05/18/23/jingjiren.png
      */
-    var id: String? = null
     var version_name: String? = null
     var application_id: String? = null
     var application_name: String? = null
         get() {
             return field + "(" + version_name + ")"
         }
-    val system_name: String? = null
-    val download_url: String? = null
-    val version_type: String? = null
+    var system_name: String? = null
+    var download_url: String? = null
+    var version_type: String? = null
     var create_time: String? = null
         get() {
             val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd hh:mm:ss", Locale.getDefault())
@@ -45,7 +44,7 @@ data class PackageEntity(val s: String) : ISelectable {
         }
 
 
-    val icon_url: String? = null
+    var icon_url: String? = null
     override fun getID(): String? {
         return id
     }

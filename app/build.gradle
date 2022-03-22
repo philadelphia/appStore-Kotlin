@@ -6,6 +6,7 @@ plugins {
 android {
     compileSdkVersion 30
     buildToolsVersion "29.0.3"
+    println(rootProject.ext.test_version)
 
     defaultConfig {
         applicationId "com.example.installer"

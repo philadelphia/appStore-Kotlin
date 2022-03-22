@@ -5,9 +5,8 @@ package com.example.installer.entity
 @date   2020/10/27
 
  **/
-class ProductEntity : ISelectable {
-    private var id: String? = null
-    var application_name: String? = null
+data class ProductEntity(var id: String?, var application_name: String?) : ISelectable {
+
     override fun getID(): String? {
         return id
     }

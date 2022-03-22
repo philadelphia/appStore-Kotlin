@@ -304,7 +304,7 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
     private fun onLoadProductListSuccess(dataSource: List<ProductEntity>?) {
         binding.swipeRefreshLayout.isRefreshing = false
         mProductList.clear()
-        val packageEntity = ProductEntity()
+        val packageEntity = ProductEntity("0",null)
         packageEntity.application_name = "全部"
         mProductList.add(0, packageEntity)
         dataSource?.let {

@@ -1,0 +1,5 @@
+ext{
+    test_version = 4
+    kotlin_version = "1.4.10"
+    test_kotlin_version = 5
+}
