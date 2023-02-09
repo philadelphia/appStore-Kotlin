@@ -35,7 +35,7 @@ android {
     packagingOptions {
         exclude 'META-INF/library_release.kotlin_module'
     }
-    buildFeatures{
+    buildFeatures {
         viewBinding true
     }
 
@@ -45,34 +45,30 @@ dependencies {
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     implementation 'androidx.core:core-ktx:1.2.0'
-    implementation 'androidx.appcompat:appcompat:1.2.0'
-    implementation "androidx.lifecycle:lifecycle-extensions:2.2.0"
+    implementation(AndroidX.appCompat)
+    implementation(AndroidX.lifecycleExtension)
+    implementation(AndroidX.constraintlayout)
+    implementation(AndroidX.recyclerView)
     implementation 'com.google.android.material:material:1.2.1'
-    implementation 'androidx.constraintlayout:constraintlayout:2.0.2'
     testImplementation 'junit:junit:4.13.1'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    implementation 'androidx.appcompat:appcompat:1.0.0'
-    implementation 'androidx.recyclerview:recyclerview:1.0.0'
-
     /*glide*/
-    implementation 'com.github.bumptech.glide:glide:4.10.0'
-    annotationProcessor 'com.github.bumptech.glide:compiler:4.10.0'
+    implementation(ThirdParty.glide)
+    annotationProcessor(ThirdParty.glideCompiler)
     /*gson*/
-    implementation 'com.google.code.gson:gson:2.8.2'
-    implementation 'com.squareup.retrofit2:retrofit:2.3.0'
-    implementation 'com.squareup.retrofit2:retrofit-converters:2.3.0'
-    implementation 'com.squareup.retrofit2:retrofit-adapters:2.3.0'
-    implementation 'com.squareup.retrofit2:converter-gson:2.3.0'
-    implementation 'com.squareup.retrofit2:adapter-rxjava:2.3.0'
-    implementation 'com.squareup.okhttp3:okhttp:3.12.0'
-    implementation 'com.squareup.okhttp3:logging-interceptor:3.9.1'
-//    implementation 'com.jakewharton.retrofit:retrofit2-rxjava2-adapter:1.0.0'
-    implementation 'com.tbruyelle.rxpermissions:rxpermissions:0.9.3@aar'
-    implementation 'io.reactivex:rxjava:1.3.6'
-    implementation 'io.reactivex:rxandroid:1.2.1'
-
-    implementation 'com.zhy:autolayout:1.4.5'
-    implementation 'com.liulishuo.filedownloader:library:1.7.3'
+    implementation(ThirdParty.gson)
+    implementation(ThirdParty.retrofit)
+    implementation(ThirdParty.retrofitConverters)
+    implementation(ThirdParty.retrofitAdapters)
+    implementation(ThirdParty.converterGson)
+    implementation(ThirdParty.adapterRxjava)
+    implementation(ThirdParty.okHttp)
+    implementation(ThirdParty.okHttpLoggingInterceptor)
+    implementation(ThirdParty.rxPermissions)
+    implementation(ThirdParty.rxJava)
+    implementation(ThirdParty.rxAndroid)
+    implementation(ThirdParty.autoLayout)
+    implementation(ThirdParty.fileDownloader)
 }

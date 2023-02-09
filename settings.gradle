@@ -1,2 +1,4 @@
 include ':app'
+include ':build_src'
 rootProject.name = "Installer"
+project(":build_src").projectDir = new File(":buildSrc")
