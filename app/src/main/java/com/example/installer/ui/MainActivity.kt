@@ -36,6 +36,9 @@ import com.example.installer.utils.CustomRecyclerOnScrollListener
 import com.example.installer.utils.NetWorkUtil
 import com.example.installer.view.CustomBottomSheetDialog
 import com.tbruyelle.rxpermissions.RxPermissions
+import rx.Observable
+import rx.Observer
+import rx.Single
 
 
 class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,

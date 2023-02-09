@@ -19,17 +19,16 @@ class WelcomeActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         @Suppress("DEPRECATION")
+        binding = ActivityWelcomeBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            window.insetsController?.hide(WindowInsets.Type.statusBars())
+            window?.insetsController?.hide(WindowInsets.Type.statusBars())
         } else {
             window.setFlags(
                 WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN
             )
         }
-        binding = ActivityWelcomeBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-
         if (!isTaskRoot) {
             val intent = Intent()
             val action: String? = intent.action
@@ -38,9 +37,6 @@ class WelcomeActivity : AppCompatActivity() {
                 return
             }
         }
-
-        binding = ActivityWelcomeBinding.inflate(layoutInflater)
-        setContentView(binding.root)
 
         val layoutParams: RelativeLayout.LayoutParams =
             (binding.imgIcon.layoutParams) as RelativeLayout.LayoutParams
